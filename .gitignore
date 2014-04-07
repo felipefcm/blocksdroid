@@ -1,0 +1,7 @@
+bin
+gen
+libs
+andengine
+.settings
+/.classpath
+/proguard-project.txt
