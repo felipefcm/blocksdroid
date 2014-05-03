@@ -52,6 +52,7 @@ public class ResourceManager
 	public ITextureRegion m_BlueBlockRegion;
 	public ITextureRegion m_GreenBlockRegion;
 	public ITextureRegion m_RedBlockRegion;
+	public ITextureRegion m_OrangeBlockRegion;
 	//----------------------------------------
 	
 	private Font m_TitleFont;
@@ -129,6 +130,7 @@ public class ResourceManager
 		m_RedBlockRegion = TextureRegionFactory.extractFromTexture(m_BlockTexture, 0, 0, 64, 64);
 		m_GreenBlockRegion = TextureRegionFactory.extractFromTexture(m_BlockTexture, 64, 0, 64, 64);
 		m_BlueBlockRegion = TextureRegionFactory.extractFromTexture(m_BlockTexture, 128, 0, 64, 64);
+		m_OrangeBlockRegion = TextureRegionFactory.extractFromTexture(m_BlockTexture, 192, 0, 64, 64);
 		
 		m_BlockTexture.load();
 		

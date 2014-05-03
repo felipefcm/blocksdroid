@@ -25,6 +25,10 @@ public class BlockFactory
 			case Blue:
 				newBlock = new Block(type, ResourceManager.m_sInstance.m_BlueBlockRegion);
 			break;
+			
+			case Orange:
+				newBlock = new Block(type, ResourceManager.m_sInstance.m_OrangeBlockRegion);
+			break;
 		}
 		
 		newBlock.setIgnoreUpdate(true);
@@ -50,6 +54,10 @@ public class BlockFactory
 			
 			case 2:
 				newBlock = GetBlock(BlockType.Blue);
+			break;
+			
+			case 3:
+				newBlock = GetBlock(BlockType.Orange);
 			break;
 				
 			default:

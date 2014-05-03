@@ -16,7 +16,8 @@ public class Block extends Sprite
 	{
 		Blue,
 		Green,
-		Red
+		Red,
+		Orange
 	}
 	
 	public boolean m_IsPlaced;
