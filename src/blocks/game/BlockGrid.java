@@ -9,13 +9,14 @@ import org.andengine.util.debug.Debug;
 
 import android.graphics.Point;
 import android.graphics.PointF;
+import blocks.game.Block.BlockType;
 import blocks.resource.BlockFactory;
 import blocks.resource.ResourceManager;
 import blocks.scene.SceneManager;
 
 public class BlockGrid extends Entity implements ITimerCallback
 {
-	//Member variables ------------------------------------------------------
+//Member variables ------------------------------------------------------
 	private int m_NumRows;
 	private int m_NumCols;
 	private Block[][] m_Blocks;
@@ -28,8 +29,17 @@ public class BlockGrid extends Entity implements ITimerCallback
 	private boolean m_TouchMoving;
 	private PointF m_TouchMoveStartedPoint;
 	private PointF m_TouchMoveFinishedPoint;
-	//-----------------------------------------------------------------------
 	
+	private final float m_MinTouchLength = Block.m_sBlockViewSize * 0.7f;
+	private final float m_MaxTouchLength = Block.m_sBlockViewSize * 1.5f;
+	
+	public enum MoveDirection
+	{
+		Up, Down,
+		Right, Left
+	}
+//-----------------------------------------------------------------------
+
 	public BlockGrid(int numRows, int numCols)
 	{
 		m_NumRows = numRows;
@@ -54,14 +64,19 @@ public class BlockGrid extends Entity implements ITimerCallback
 		this.attachChild(m_BlocksBatch);
 		
 		SceneManager.m_sInstance.GetPlayScene().registerUpdateHandler(this);
-		SceneManager.m_sInstance.GetPlayScene().registerUpdateHandler(new TimerHandler(0.8f, true, this));
+		SceneManager.m_sInstance.GetPlayScene().registerUpdateHandler(new TimerHandler(0.4f, true, this));
 		SceneManager.m_sInstance.GetPlayScene().registerTouchArea(this);
 		
 		CreateNewFallingPiece();
 	}
 	
-	//Grid management ------------------------------------------------------------------------
+//Grid management ------------------------------------------------------------------------
 	private boolean InsertBlockInGrid(Block block)
+	{
+		return InsertBlockInGrid(block, true);
+	}
+	
+	private boolean InsertBlockInGrid(Block block, boolean updateBatch)
 	{
 		Point blockGridPos = block.GetGridPos();
 		
@@ -74,24 +89,77 @@ public class BlockGrid extends Entity implements ITimerCallback
 		
 		block.setPosition(pos.x, pos.y);
 		
-		m_BlocksBatch.UpdateBatch();
+		if(updateBatch)
+			m_BlocksBatch.UpdateBatch();
 		
 		--m_EmptyPositions;
 		
 		return true;
 	}
 	
-	private void RemoveBlockFromGrid(Block block)
+	private void RemoveBlockFromGrid(Block block, boolean updateBatch)
 	{
 		Point blockPos = block.GetGridPos();
 		
-		m_Blocks[blockPos.y][blockPos.x] = null;
+		RemoveBlockFromGrid(blockPos, updateBatch);
+	}
+	
+	private void RemoveBlockFromGrid(Point gridPos, boolean updateBatch)
+	{
+		m_Blocks[gridPos.y][gridPos.x] = null;
 		
-		block.dispose();
+		//block.dispose();
 		
-		m_BlocksBatch.UpdateBatch();
+		if(updateBatch)
+			m_BlocksBatch.UpdateBatch();
 		
 		++m_EmptyPositions;
+	}
+	
+	private boolean MoveBlockInGrid(Block block, Point dstGridPos, boolean updateBatch)
+	{
+		if(!IsGridPositionAvailable(dstGridPos))
+			return false;
+		
+		Point srcGridPos = block.GetGridPos();
+		
+		if(m_Blocks[srcGridPos.y][srcGridPos.x] == null)
+			return false;
+		
+		m_Blocks[srcGridPos.y][srcGridPos.x] = null;
+		m_Blocks[dstGridPos.y][dstGridPos.x] = block;
+		
+		PointF worldPos = FromGridToWorld(dstGridPos);
+		
+		block.SetGridPos(dstGridPos);
+		block.setPosition(worldPos.x, worldPos.y);
+		
+		if(updateBatch)
+			m_BlocksBatch.UpdateBatch();
+		
+		return true;
+	}
+	
+	private boolean SwapBlocksInGrid(Block blockA, Block blockB, boolean updateBatch)
+	{
+		Point aGridPos = blockA.GetGridPos();
+		Point bGridPos = blockB.GetGridPos();
+		PointF aWorldPos = FromGridToWorld(aGridPos);
+		PointF bWorldPos = FromGridToWorld(bGridPos);
+		
+		blockA.SetGridPos(bGridPos);
+		blockB.SetGridPos(aGridPos);
+		
+		blockA.setPosition(bWorldPos.x, bWorldPos.y);
+		blockB.setPosition(aWorldPos.x, aWorldPos.y);
+		
+		m_Blocks[aGridPos.y][aGridPos.x] = blockB;
+		m_Blocks[bGridPos.y][bGridPos.x] = blockA;
+		
+		if(updateBatch)
+			m_BlocksBatch.UpdateBatch();
+		
+		return true;
 	}
 	
 	private boolean IsGridPositionAvailable(Point gridPosition)
@@ -125,7 +193,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 					((float) gridPosition.y + 0.5f) * Block.m_sBlockViewSize
 				);
 	}
-
+	
 	private Point FromWorldToGrid(PointF worldPosition)
 	{
 		return new Point
@@ -134,9 +202,44 @@ public class BlockGrid extends Entity implements ITimerCallback
 					(int)(worldPosition.y / Block.m_sBlockViewSize)
 				);
 	}
-	//----------------------------------------------------------------------------------------
 	
-	//Falling piece --------------------------------------------------------------------------
+	private void MoveDownPlacedBlocks()
+	{
+		for(int i = 1; i < m_NumRows; ++i) //we can skip first row
+			for(int j = 0; j < m_NumCols; ++j)
+			{
+				Block block = m_Blocks[i][j]; 
+				
+				if(block == null)
+					continue;
+				
+				if(block == m_FallingPiece)
+					continue;
+				
+				//last occupied position
+				int k;
+				
+				for(k = i - 1; k >= 0; --k)
+				{
+					if(m_Blocks[k][j] == null)
+						continue;
+					else
+						break;
+				}
+				
+				m_Blocks[i][j] = null;
+				m_Blocks[k + 1][j] = block;
+				
+				block.SetGridPos(j, k + 1);
+				
+				PointF worldPos = FromGridToWorld(block.GetGridPos());
+				
+				block.setPosition(worldPos.x, worldPos.y);
+			}
+	}
+//----------------------------------------------------------------------------------------
+	
+//Falling piece --------------------------------------------------------------------------
 	private void CreateNewFallingPiece()
 	{
 		if(m_EmptyPositions == 0)
@@ -154,24 +257,108 @@ public class BlockGrid extends Entity implements ITimerCallback
 		while(!InsertBlockInGrid(m_FallingPiece));
 	}
 	
-	private void MoveDownFallingPiece(Point nextGridPos)
+	private void MoveDownFallingPiece(Point nextGridPos, boolean updateBatch)
 	{
-		//the position is already checked by 'onTimePassed'
-		Point currentGridPos = m_FallingPiece.GetGridPos(); 
-		
-		m_Blocks[currentGridPos.y][currentGridPos.x] = null;
-		m_Blocks[nextGridPos.y][nextGridPos.x] = m_FallingPiece;
-		
-		m_FallingPiece.SetGridPos(nextGridPos);
-		
-		PointF pos = FromGridToWorld(nextGridPos);
-		m_FallingPiece.setPosition(pos.x, pos.y);
-		
-		m_BlocksBatch.UpdateBatch();
+		//'nextGridPos' is already checked by 'onTimePassed' function
+		MoveBlockInGrid(m_FallingPiece, nextGridPos, updateBatch);
 	}
-	//----------------------------------------------------------------------------------------
 	
-	//Events ---------------------------------------------------------------------------------
+	private int CheckColumnElimination(int col)
+	{
+		BlockType currentType = null;
+		int currentTypeCount = 0;
+		
+		for(int i = 0; i < m_NumRows; ++i)
+		{
+			Block block = m_Blocks[i][col]; 
+			
+			if(block == null)
+			{
+				return -1;
+			}
+			
+			if(currentType == null)
+				currentType = block.GetType();
+			
+			if(currentType == block.GetType())
+			{
+				++currentTypeCount;
+			}
+			else
+			{
+				currentType = null;
+				currentTypeCount = 0;
+				continue;
+			}
+			
+			if(currentTypeCount == 3)
+			{
+				//return the last block (the top most one)
+				return i;
+			}
+		}
+		
+		return -1;
+	}
+	
+	private int CheckRowElimination(int row)
+	{
+		BlockType currentType = null;
+		int currentTypeCount = 0;
+		
+		for(int i = 0; i < m_NumCols; ++i)
+		{
+			Block block = m_Blocks[row][i]; 
+			
+			if(block == null)
+			{
+				return -1;
+			}
+			
+			if(currentType == null)
+				currentType = block.GetType();
+			
+			if(currentType == block.GetType())
+			{
+				++currentTypeCount;
+			}
+			else
+			{
+				currentType = null;
+				currentTypeCount = 0;
+				continue;
+			}
+			
+			if(currentTypeCount == 3)
+			{
+				//return the last block (the right most one)
+				return i;
+			}
+		}
+		
+		return -1;
+	}
+	
+	private void DestroyColumnGroup(int topMost, int col)
+	{
+		Debug.d("DestroyCol: " + topMost);
+		
+		RemoveBlockFromGrid(new Point(col, topMost), false);
+		RemoveBlockFromGrid(new Point(col, topMost - 1), false);
+		RemoveBlockFromGrid(new Point(col, topMost - 2), false);
+	}
+	
+	private void DestroyRowGroup(int rightMost, int row)
+	{
+		Debug.d("DestroyRow: " + rightMost);
+		
+		RemoveBlockFromGrid(new Point(rightMost, row), false);
+		RemoveBlockFromGrid(new Point(rightMost - 1, row), false);
+		RemoveBlockFromGrid(new Point(rightMost - 2, row), false);
+	}
+//----------------------------------------------------------------------------------------
+	
+//Events ---------------------------------------------------------------------------------
 	@Override
 	public boolean onAreaTouched(TouchEvent touchEvent, float localX, float localY) 
 	{		
@@ -216,19 +403,22 @@ public class BlockGrid extends Entity implements ITimerCallback
 		
 		float length = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 		
-		if(length < Block.m_sBlockViewSize * 0.7f)
+		if(length >= m_MaxTouchLength)
 		{
-			Debug.d("Ignoring move because of length: " + length);
+			Debug.d("Ignoring move because it has passed maximum length");
+			return;
+		}
+		
+		if(Math.abs(deltaX) >= m_MinTouchLength && Math.abs(deltaY) >= m_MinTouchLength)
+		{
+			Debug.d("Ignoring move because it is ambiguous");
 			return;
 		}
 		
 		Point srcGridPos = FromWorldToGrid(m_TouchMoveStartedPoint);
-		Point dstGridPos = FromWorldToGrid(m_TouchMoveFinishedPoint);
 		
 		Block srcBlock = m_Blocks[srcGridPos.y][srcGridPos.x];
-		Block dstBlock = m_Blocks[dstGridPos.y][dstGridPos.x];
-		
-		//if()
+		Block dstBlock = null;
 		
 		if(srcBlock == null)
 		{
@@ -238,52 +428,73 @@ public class BlockGrid extends Entity implements ITimerCallback
 		
 		if(!srcBlock.m_IsPlaced)
 		{
-			Debug.d("Ignoring move because sorce block is not placed");
+			Debug.d("Ignoring move because source block is not placed (falling piece)");
 			return;
 		}
 		
-		if(dstBlock == null)
+		if(Math.abs(deltaX) >= m_MinTouchLength)
 		{
-			//moving block to empty position
-			srcBlock.SetGridPos(dstGridPos);
-
-			PointF newWorldPosition = FromGridToWorld(dstGridPos);
-			srcBlock.setPosition(newWorldPosition.x, newWorldPosition.y);
-			
-			m_Blocks[dstGridPos.y][dstGridPos.x] = srcBlock;
-			m_Blocks[srcGridPos.y][srcGridPos.x] = null;
-			
-			m_BlocksBatch.UpdateBatch();
+			if(deltaX > 0)
+			{
+				Debug.d("Moved right");
+				
+				if(srcGridPos.x < m_NumCols)
+					dstBlock = m_Blocks[srcGridPos.y][srcGridPos.x + 1];
+			}
+			else
+			{
+				Debug.d("Moved left");
+				
+				if(srcGridPos.x > 0)
+					dstBlock = m_Blocks[srcGridPos.y][srcGridPos.x - 1];
+			}
 		}
 		else
 		{
-			//switch blocks
-			srcBlock.SetGridPos(dstGridPos);
-			dstBlock.SetGridPos(srcGridPos);
+			if(deltaY > 0)
+			{
+				Debug.d("Moved up");
+				
+				if(srcGridPos.y < m_NumRows)
+					dstBlock = m_Blocks[srcGridPos.y + 1][srcGridPos.x];
+			}
+			else
+			{
+				Debug.d("Moved down");
+				
+				if(srcGridPos.y > 0)
+					dstBlock = m_Blocks[srcGridPos.y - 1][srcGridPos.x];
+			}
+		}
+		
+		if(dstBlock == m_FallingPiece)
+		{
+			Debug.d("Ignoring block switch because destination piece is the falling piece");
+			return;
+		}
+		
+		if(dstBlock != null)
+		{
+			Point dstGridPos = dstBlock.GetGridPos();
 			
-			PointF srcNewWorldPosition = FromGridToWorld(dstGridPos);
-			PointF dstNewWorldPosition = FromGridToWorld(srcGridPos);
-			srcBlock.setPosition(srcNewWorldPosition.x, srcNewWorldPosition.y);
-			dstBlock.setPosition(dstNewWorldPosition.x, dstNewWorldPosition.y);
+			SwapBlocksInGrid(srcBlock, dstBlock, false);
 			
-			m_Blocks[srcGridPos.y][srcGridPos.x] = dstBlock;
-			m_Blocks[dstGridPos.y][dstGridPos.x] = srcBlock;
+			int eliminationPos;
+			
+			while((eliminationPos = CheckColumnElimination(dstGridPos.x)) != -1)
+			{
+				DestroyColumnGroup(eliminationPos, dstGridPos.x);
+				MoveDownPlacedBlocks();
+			}
+		
+			while((eliminationPos = CheckRowElimination(dstGridPos.y)) != -1)
+			{
+				DestroyRowGroup(eliminationPos, dstGridPos.y);
+				MoveDownPlacedBlocks();
+			}
 			
 			m_BlocksBatch.UpdateBatch();
 		}
-		
-		/*
-		if(deltaX > 0)
-		{
-			Debug.d("Moved right");
-		}
-		else
-		{
-			Debug.d("Moved left");
-		}
-		*/
-		
-		Debug.d("OnTouchMoveFinished called: " + deltaX + ", " + deltaY);
 	}
 	
 	@Override
@@ -304,14 +515,29 @@ public class BlockGrid extends Entity implements ITimerCallback
 		if(nextPos.y < 0 || !IsGridPositionAvailable(nextPos))
 		{
 			m_FallingPiece.m_IsPlaced = true;
+			
+			int eliminationPos;
+			
+			while((eliminationPos = CheckColumnElimination(blockPos.x)) != -1)
+			{
+				DestroyColumnGroup(eliminationPos, blockPos.x);
+				MoveDownPlacedBlocks();
+			}
+			
+			while((eliminationPos = CheckRowElimination(blockPos.y)) != -1)
+			{
+				DestroyRowGroup(eliminationPos, blockPos.y);
+				MoveDownPlacedBlocks();
+			}
+			
 			m_FallingPiece = null;
 			
 			CreateNewFallingPiece();
 		}
 		else
 		{
-			MoveDownFallingPiece(nextPos);
+			MoveDownFallingPiece(nextPos, true);
 		}
 	}
-	//----------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------
 }

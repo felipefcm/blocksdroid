@@ -62,24 +62,3 @@ public class SceneManager
 		return m_PlayScene;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
