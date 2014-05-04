@@ -19,7 +19,8 @@ public class BlockGrid extends Entity implements ITimerCallback
 //Member variables ------------------------------------------------------
 	private int m_NumRows;
 	private int m_NumCols;
-	private Block[][] m_Blocks;
+	private BlockMatrix m_Matrix;
+	
 	private Block m_FallingPiece;
 	
 	private int m_EmptyPositions;
@@ -45,7 +46,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 		m_NumRows = numRows;
 		m_NumCols = numCols;
 		
-		m_Blocks = new Block[m_NumRows][m_NumCols];
+		m_Matrix = new BlockMatrix(numRows, numCols);
 		
 		m_EmptyPositions = m_NumRows * m_NumCols;
 		
@@ -53,7 +54,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 				(
 					ResourceManager.m_sInstance.m_BlockTexture,
 					m_NumRows * m_NumCols,
-					m_Blocks
+					m_Matrix.GetMatrix()
 				);
 		
 		m_TouchMoving = false;
@@ -71,6 +72,11 @@ public class BlockGrid extends Entity implements ITimerCallback
 	}
 	
 //Grid management ------------------------------------------------------------------------
+	private boolean IsGridPositionAvailable(Point gridPosition)
+	{
+		return (m_Matrix.GetAt(gridPosition) == null);
+	}
+	
 	private boolean InsertBlockInGrid(Block block)
 	{
 		return InsertBlockInGrid(block, true);
@@ -83,7 +89,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 		if(!IsGridPositionAvailable(blockGridPos))
 			return false;
 		
-		m_Blocks[blockGridPos.y][blockGridPos.x] = block;
+		m_Matrix.SetBlockAt(block, blockGridPos);
 		
 		PointF pos = FromGridToWorld(blockGridPos);
 		
@@ -97,18 +103,17 @@ public class BlockGrid extends Entity implements ITimerCallback
 		return true;
 	}
 	
-	private void RemoveBlockFromGrid(Block block, boolean updateBatch)
+	private void RemoveBlockFromGrid(Point gridPos)
 	{
-		Point blockPos = block.GetGridPos();
-		
-		RemoveBlockFromGrid(blockPos, updateBatch);
+		RemoveBlockFromGrid(gridPos, true);
 	}
 	
 	private void RemoveBlockFromGrid(Point gridPos, boolean updateBatch)
 	{
-		m_Blocks[gridPos.y][gridPos.x] = null;
+		if(m_Matrix.GetAt(gridPos) == null)
+			return;
 		
-		//block.dispose();
+		m_Matrix.ClearPosition(gridPos);
 		
 		if(updateBatch)
 			m_BlocksBatch.UpdateBatch();
@@ -123,11 +128,11 @@ public class BlockGrid extends Entity implements ITimerCallback
 		
 		Point srcGridPos = block.GetGridPos();
 		
-		if(m_Blocks[srcGridPos.y][srcGridPos.x] == null)
+		if(m_Matrix.GetAt(srcGridPos) == null)
 			return false;
 		
-		m_Blocks[srcGridPos.y][srcGridPos.x] = null;
-		m_Blocks[dstGridPos.y][dstGridPos.x] = block;
+		m_Matrix.ClearPosition(srcGridPos);
+		m_Matrix.SetBlockAt(block, dstGridPos);
 		
 		PointF worldPos = FromGridToWorld(dstGridPos);
 		
@@ -147,14 +152,14 @@ public class BlockGrid extends Entity implements ITimerCallback
 		PointF aWorldPos = FromGridToWorld(aGridPos);
 		PointF bWorldPos = FromGridToWorld(bGridPos);
 		
+		m_Matrix.SetBlockAt(blockB, aGridPos);
+		m_Matrix.SetBlockAt(blockA, bGridPos);
+		
 		blockA.SetGridPos(bGridPos);
 		blockB.SetGridPos(aGridPos);
 		
 		blockA.setPosition(bWorldPos.x, bWorldPos.y);
 		blockB.setPosition(aWorldPos.x, aWorldPos.y);
-		
-		m_Blocks[aGridPos.y][aGridPos.x] = blockB;
-		m_Blocks[bGridPos.y][bGridPos.x] = blockA;
 		
 		if(updateBatch)
 			m_BlocksBatch.UpdateBatch();
@@ -162,14 +167,10 @@ public class BlockGrid extends Entity implements ITimerCallback
 		return true;
 	}
 	
-	private boolean IsGridPositionAvailable(Point gridPosition)
-	{
-		return (m_Blocks[gridPosition.y][gridPosition.x] == null);
-	}
-	
-	//for debugging
 	public void RandomizeGrid()
 	{
+		//for testing only
+		
 		for(int i = 0; i < m_NumRows; ++i)
 		{
 			for(int j = 0; j < m_NumCols; ++j)
@@ -208,7 +209,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 		for(int i = 1; i < m_NumRows; ++i) //we can skip first row
 			for(int j = 0; j < m_NumCols; ++j)
 			{
-				Block block = m_Blocks[i][j]; 
+				Block block = m_Matrix.GetAt(i, j); 
 				
 				if(block == null)
 					continue;
@@ -221,20 +222,13 @@ public class BlockGrid extends Entity implements ITimerCallback
 				
 				for(k = i - 1; k >= 0; --k)
 				{
-					if(m_Blocks[k][j] == null)
+					if(m_Matrix.GetAt(k, j) == null)
 						continue;
 					else
 						break;
 				}
 				
-				m_Blocks[i][j] = null;
-				m_Blocks[k + 1][j] = block;
-				
-				block.SetGridPos(j, k + 1);
-				
-				PointF worldPos = FromGridToWorld(block.GetGridPos());
-				
-				block.setPosition(worldPos.x, worldPos.y);
+				MoveBlockInGrid(block, new Point(j, k + 1), false);
 			}
 	}
 //----------------------------------------------------------------------------------------
@@ -270,7 +264,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 		
 		for(int i = 0; i < m_NumRows; ++i)
 		{
-			Block block = m_Blocks[i][col]; 
+			Block block = m_Matrix.GetAt(i, col); 
 			
 			if(block == null)
 			{
@@ -308,7 +302,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 		
 		for(int i = 0; i < m_NumCols; ++i)
 		{
-			Block block = m_Blocks[row][i]; 
+			Block block = m_Matrix.GetAt(row, i); 
 			
 			if(block == null)
 			{
@@ -417,7 +411,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 		
 		Point srcGridPos = FromWorldToGrid(m_TouchMoveStartedPoint);
 		
-		Block srcBlock = m_Blocks[srcGridPos.y][srcGridPos.x];
+		Block srcBlock = m_Matrix.GetAt(srcGridPos);
 		Block dstBlock = null;
 		
 		if(srcBlock == null)
@@ -439,14 +433,14 @@ public class BlockGrid extends Entity implements ITimerCallback
 				Debug.d("Moved right");
 				
 				if(srcGridPos.x < m_NumCols)
-					dstBlock = m_Blocks[srcGridPos.y][srcGridPos.x + 1];
+					dstBlock = m_Matrix.GetAt(srcGridPos.y, srcGridPos.x + 1);
 			}
 			else
 			{
 				Debug.d("Moved left");
 				
 				if(srcGridPos.x > 0)
-					dstBlock = m_Blocks[srcGridPos.y][srcGridPos.x - 1];
+					dstBlock = m_Matrix.GetAt(srcGridPos.y, srcGridPos.x - 1);
 			}
 		}
 		else
@@ -456,14 +450,14 @@ public class BlockGrid extends Entity implements ITimerCallback
 				Debug.d("Moved up");
 				
 				if(srcGridPos.y < m_NumRows)
-					dstBlock = m_Blocks[srcGridPos.y + 1][srcGridPos.x];
+					dstBlock = m_Matrix.GetAt(srcGridPos.y + 1, srcGridPos.x);
 			}
 			else
 			{
 				Debug.d("Moved down");
 				
 				if(srcGridPos.y > 0)
-					dstBlock = m_Blocks[srcGridPos.y - 1][srcGridPos.x];
+					dstBlock = m_Matrix.GetAt(srcGridPos.y - 1, srcGridPos.x);
 			}
 		}
 		

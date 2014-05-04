@@ -10,9 +10,9 @@ import blocks.resource.ResourceManager;
 public class BlockSpriteBatch extends DynamicSpriteBatch 
 {
 	private boolean m_IsBatchDirty;
-	private Block[][] m_BlockMatrix;
+	private final Block[][] m_BlockMatrix;
 	
-	public BlockSpriteBatch(ITexture texture, int capacity, Block[][] blockMatrix)
+	public BlockSpriteBatch(ITexture texture, int capacity, final Block[][] blockMatrix)
 	{
 		super(texture, capacity, ResourceManager.m_sInstance.m_VBOManager);
 		
