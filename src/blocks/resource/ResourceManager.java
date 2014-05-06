@@ -97,6 +97,7 @@ public class ResourceManager
 		
 		long seed = new Date().getTime();
 		m_Random = new Random(seed);
+		//m_Random = new Random(8L); //for testing
 		Debug.d("Using seed: " + seed);
 		
 		InitCommonResources();

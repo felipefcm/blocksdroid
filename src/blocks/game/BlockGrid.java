@@ -255,8 +255,51 @@ public class BlockGrid extends Entity implements ITimerCallback
 	{
 		//'nextGridPos' is already checked by 'onTimePassed' function
 		MoveBlockInGrid(m_FallingPiece, nextGridPos, updateBatch);
-	}
+	}	
+//----------------------------------------------------------------------------------------
 	
+//Piece elimination ----------------------------------------------------------------------
+	private void ProcessScoringConditions()
+	{
+		boolean destructionFinished = false;
+		
+		while(!destructionFinished)
+		{
+			boolean hadColumnDestruction = false;
+			boolean hadRowDestruction = false;
+			
+			for(int col = 0; col < m_NumCols; ++col)
+			{
+				int colEliminationPos = CheckColumnElimination(col);
+				
+				if(colEliminationPos != -1)
+				{
+					DestroyColumnGroup(colEliminationPos, col);
+					MoveDownPlacedBlocks(); //TODO check if can move down only that column
+					
+					hadColumnDestruction = true;
+					break;
+				}
+			}
+			
+			for(int row = 0; row < m_NumRows; ++row)
+			{
+				int rowEliminationPos = CheckRowElimination(row);
+				
+				if(rowEliminationPos != -1)
+				{
+					DestroyRowGroup(rowEliminationPos, row);
+					MoveDownPlacedBlocks(); //TODO check if can move down only three columns
+					
+					hadRowDestruction = true;
+					break;
+				}
+			}
+			
+			destructionFinished = !hadColumnDestruction && !hadRowDestruction;
+		}
+	}
+
 	private int CheckColumnElimination(int col)
 	{
 		BlockType currentType = null;
@@ -266,7 +309,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 		{
 			Block block = m_Matrix.GetAt(i, col); 
 			
-			if(block == null)
+			if(block == null || block == m_FallingPiece)
 			{
 				return -1;
 			}
@@ -304,9 +347,11 @@ public class BlockGrid extends Entity implements ITimerCallback
 		{
 			Block block = m_Matrix.GetAt(row, i); 
 			
-			if(block == null)
+			if(block == null || block == m_FallingPiece)
 			{
-				return -1;
+				currentType = null;
+				currentTypeCount = 0;
+				continue;
 			}
 			
 			if(currentType == null)
@@ -468,31 +513,17 @@ public class BlockGrid extends Entity implements ITimerCallback
 		}
 		
 		if(dstBlock != null)
-		{
-			Point dstGridPos = dstBlock.GetGridPos();
-			
+		{			
 			SwapBlocksInGrid(srcBlock, dstBlock, false);
 			
-			int eliminationPos;
-			
-			while((eliminationPos = CheckColumnElimination(dstGridPos.x)) != -1)
-			{
-				DestroyColumnGroup(eliminationPos, dstGridPos.x);
-				MoveDownPlacedBlocks();
-			}
-		
-			while((eliminationPos = CheckRowElimination(dstGridPos.y)) != -1)
-			{
-				DestroyRowGroup(eliminationPos, dstGridPos.y);
-				MoveDownPlacedBlocks();
-			}
+			ProcessScoringConditions();
 			
 			m_BlocksBatch.UpdateBatch();
 		}
 	}
 	
 	@Override
-	protected void onManagedUpdate(float pSecondsElapsed) 
+	protected final void onManagedUpdate(float pSecondsElapsed) 
 	{
 		super.onManagedUpdate(pSecondsElapsed);
 	}
@@ -501,35 +532,28 @@ public class BlockGrid extends Entity implements ITimerCallback
 	public void onTimePassed(TimerHandler pTimerHandler)
 	{
 		if(m_FallingPiece == null)
+		{
+			SceneManager.m_sInstance.GetCurrentScene().unregisterUpdateHandler(pTimerHandler);
 			return;
+		}
 		
 		Point blockPos = m_FallingPiece.GetGridPos();
 		Point nextPos = new Point(blockPos.x, blockPos.y - 1);
 		
+		//Check if falling piece can fall another position
 		if(nextPos.y < 0 || !IsGridPositionAvailable(nextPos))
 		{
+			//Falling piece cannot fall anymore, place it
 			m_FallingPiece.m_IsPlaced = true;
-			
-			int eliminationPos;
-			
-			while((eliminationPos = CheckColumnElimination(blockPos.x)) != -1)
-			{
-				DestroyColumnGroup(eliminationPos, blockPos.x);
-				MoveDownPlacedBlocks();
-			}
-			
-			while((eliminationPos = CheckRowElimination(blockPos.y)) != -1)
-			{
-				DestroyRowGroup(eliminationPos, blockPos.y);
-				MoveDownPlacedBlocks();
-			}
-			
 			m_FallingPiece = null;
+			
+			ProcessScoringConditions();
 			
 			CreateNewFallingPiece();
 		}
 		else
 		{
+			//it can
 			MoveDownFallingPiece(nextPos, true);
 		}
 	}
