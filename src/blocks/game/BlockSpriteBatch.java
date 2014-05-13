@@ -4,7 +4,6 @@ package blocks.game;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.sprite.batch.DynamicSpriteBatch;
 import org.andengine.opengl.texture.ITexture;
-import org.andengine.util.debug.Debug;
 
 import blocks.resource.ResourceManager;
 
@@ -31,21 +30,13 @@ public class BlockSpriteBatch extends DynamicSpriteBatch
 	{
 		if(m_IsBatchDirty)
 		{
-			String matrixLine = "";
-			Debug.d("Matrix:");
-			
 			for(int i = 0; i < m_BlockMatrix.length; ++i)
 			{
 				for(int j = 0; j < m_BlockMatrix[i].length; ++j)
-				{
-					matrixLine = matrixLine.concat(m_BlockMatrix[i][j] + " ");
-					
+				{					
 					if(m_BlockMatrix[i][j] != null)
 						InsertInBatch(m_BlockMatrix[i][j]);
 				}
-				
-				Debug.d(matrixLine);
-				matrixLine = "";
 			}
 			
 			//Debug.d("BlockSpriteBatch updated");
@@ -67,7 +58,7 @@ public class BlockSpriteBatch extends DynamicSpriteBatch
 				sprite.getY() - sprite.getHeight() * 0.5f,
 				sprite.getWidth(),
 				sprite.getHeight(),
-				1.0f, 1.0f, 1.0f, 1.0f
+				1.0f, 1.0f, 1.0f, 0.0f
 			);
 	}
 }
