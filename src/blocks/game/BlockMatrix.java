@@ -30,11 +30,12 @@ public class BlockMatrix
 	public void ClearPosition(Point pos)
 	{
 		Block block = m_Blocks[pos.y][pos.x];
+		m_Blocks[pos.y][pos.x] = null;
 		
-		if(block != null && !block.isDisposed())
-			block.dispose();
-		
-		m_Blocks[pos.y][pos.x] = null; 
+		/*
+		if(block != null)
+			BlockFactory.PoolBlock(block);
+		*/
 	}
 	
 	public final Block[][] GetMatrix()

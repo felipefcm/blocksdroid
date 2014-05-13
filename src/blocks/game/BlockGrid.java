@@ -32,7 +32,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 	private PointF m_TouchMoveFinishedPoint;
 	
 	private final float m_MinTouchLength = Block.m_sBlockViewSize * 0.7f;
-	private final float m_MaxTouchLength = Block.m_sBlockViewSize * 1.5f;
+	private final float m_MaxTouchLength = Block.m_sBlockViewSize * 1.6f;
 	
 	public enum MoveDirection
 	{
@@ -64,8 +64,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 	{
 		this.attachChild(m_BlocksBatch);
 		
-		SceneManager.m_sInstance.GetPlayScene().registerUpdateHandler(this);
-		SceneManager.m_sInstance.GetPlayScene().registerUpdateHandler(new TimerHandler(0.4f, true, this));
+		SceneManager.m_sInstance.GetPlayScene().registerUpdateHandler(new TimerHandler(0.25f, true, this));
 		SceneManager.m_sInstance.GetPlayScene().registerTouchArea(this);
 		
 		CreateNewFallingPiece();
@@ -89,11 +88,11 @@ public class BlockGrid extends Entity implements ITimerCallback
 		if(!IsGridPositionAvailable(blockGridPos))
 			return false;
 		
-		m_Matrix.SetBlockAt(block, blockGridPos);
-		
 		PointF pos = FromGridToWorld(blockGridPos);
 		
 		block.setPosition(pos.x, pos.y);
+		
+		m_Matrix.SetBlockAt(block, blockGridPos);
 		
 		if(updateBatch)
 			m_BlocksBatch.UpdateBatch();
@@ -102,12 +101,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 		
 		return true;
 	}
-	
-	private void RemoveBlockFromGrid(Point gridPos)
-	{
-		RemoveBlockFromGrid(gridPos, true);
-	}
-	
+
 	private void RemoveBlockFromGrid(Point gridPos, boolean updateBatch)
 	{
 		if(m_Matrix.GetAt(gridPos) == null)
@@ -131,13 +125,14 @@ public class BlockGrid extends Entity implements ITimerCallback
 		if(m_Matrix.GetAt(srcGridPos) == null)
 			return false;
 		
-		m_Matrix.ClearPosition(srcGridPos);
-		m_Matrix.SetBlockAt(block, dstGridPos);
-		
 		PointF worldPos = FromGridToWorld(dstGridPos);
+		
+		m_Matrix.ClearPosition(srcGridPos);
 		
 		block.SetGridPos(dstGridPos);
 		block.setPosition(worldPos.x, worldPos.y);
+		
+		m_Matrix.SetBlockAt(block, dstGridPos);
 		
 		if(updateBatch)
 			m_BlocksBatch.UpdateBatch();
@@ -211,10 +206,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 			{
 				Block block = m_Matrix.GetAt(i, j); 
 				
-				if(block == null)
-					continue;
-				
-				if(block == m_FallingPiece)
+				if(block == null || block == m_FallingPiece)
 					continue;
 				
 				//last occupied position
@@ -230,29 +222,40 @@ public class BlockGrid extends Entity implements ITimerCallback
 				
 				MoveBlockInGrid(block, new Point(j, k + 1), false);
 			}
+		
+		m_BlocksBatch.UpdateBatch();
 	}
 //----------------------------------------------------------------------------------------
 	
 //Falling piece --------------------------------------------------------------------------
 	private void CreateNewFallingPiece()
 	{
+		Debug.d("Creating new falling piece");
+		
 		if(m_EmptyPositions == 0)
 			return;
 		
-		m_FallingPiece = BlockFactory.GetRandomBlock();
+		Point newPos = new Point();
+		
+		newPos.y = m_NumRows - 1;
 		
 		do
 		{
 			//pick a random column to spawn falling block
-			int col = ResourceManager.m_sInstance.m_Random.nextInt(m_NumCols);
-			
-			m_FallingPiece.SetGridPos(col, m_NumRows - 1);
+			newPos.x = ResourceManager.m_sInstance.m_Random.nextInt(m_NumCols);
 		}
-		while(!InsertBlockInGrid(m_FallingPiece));
+		while(!IsGridPositionAvailable(newPos));
+		
+		m_FallingPiece = BlockFactory.GetRandomBlock();
+		m_FallingPiece.SetGridPos(newPos);
+		
+		InsertBlockInGrid(m_FallingPiece);
 	}
 	
 	private void MoveDownFallingPiece(Point nextGridPos, boolean updateBatch)
 	{
+		Debug.d("Moving down falling piece");
+		
 		//'nextGridPos' is already checked by 'onTimePassed' function
 		MoveBlockInGrid(m_FallingPiece, nextGridPos, updateBatch);
 	}	
@@ -323,9 +326,8 @@ public class BlockGrid extends Entity implements ITimerCallback
 			}
 			else
 			{
-				currentType = null;
-				currentTypeCount = 0;
-				continue;
+				currentType = block.GetType();
+				currentTypeCount = 1;
 			}
 			
 			if(currentTypeCount == 3)
@@ -363,9 +365,8 @@ public class BlockGrid extends Entity implements ITimerCallback
 			}
 			else
 			{
-				currentType = null;
-				currentTypeCount = 0;
-				continue;
+				currentType = block.GetType();
+				currentTypeCount = 1;
 			}
 			
 			if(currentTypeCount == 3)
@@ -380,7 +381,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 	
 	private void DestroyColumnGroup(int topMost, int col)
 	{
-		Debug.d("DestroyCol: " + topMost);
+		Debug.d("DestroyCol: " + col + " topMost: " + topMost);
 		
 		RemoveBlockFromGrid(new Point(col, topMost), false);
 		RemoveBlockFromGrid(new Point(col, topMost - 1), false);
@@ -389,7 +390,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 	
 	private void DestroyRowGroup(int rightMost, int row)
 	{
-		Debug.d("DestroyRow: " + rightMost);
+		Debug.d("DestroyRow: " + row + " rightMost: " + rightMost);
 		
 		RemoveBlockFromGrid(new Point(rightMost, row), false);
 		RemoveBlockFromGrid(new Point(rightMost - 1, row), false);
@@ -514,7 +515,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 		
 		if(dstBlock != null)
 		{			
-			SwapBlocksInGrid(srcBlock, dstBlock, false);
+			SwapBlocksInGrid(srcBlock, dstBlock, true);
 			
 			ProcessScoringConditions();
 			
@@ -533,6 +534,7 @@ public class BlockGrid extends Entity implements ITimerCallback
 	{
 		if(m_FallingPiece == null)
 		{
+			Debug.d("Falling piece null in 'onTimePassed', unregistering timer");
 			SceneManager.m_sInstance.GetCurrentScene().unregisterUpdateHandler(pTimerHandler);
 			return;
 		}

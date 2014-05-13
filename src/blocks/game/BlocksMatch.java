@@ -9,7 +9,7 @@ import blocks.scene.SceneManager;
 
 public class BlocksMatch implements ITimerCallback
 {
-	public static final int NumRows = 7;
+	public static final int NumRows = 6;
 	public static final int NumCols = 5;
 
 	private BlockGrid m_BlockGrid;
@@ -27,7 +27,7 @@ public class BlocksMatch implements ITimerCallback
 		m_BlockGrid.setPosition
 			(
 				ResourceManager.m_sInstance.m_ViewCenterX, 
-				ResourceManager.m_sInstance.m_ViewCenterY - Block.m_sBlockViewSize * 0.5f
+				ResourceManager.m_sInstance.m_ViewCenterY - Block.m_sBlockViewSize * 0.92f
 			);
 
 		SceneManager.m_sInstance.GetPlayScene().m_FrontLayer.attachChild(m_BlockGrid);

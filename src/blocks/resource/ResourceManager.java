@@ -7,7 +7,8 @@ import java.util.Date;
 import java.util.Random;
 
 import org.andengine.engine.Engine;
-import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.Entity;
+import org.andengine.entity.primitive.Line;
 import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.font.FontFactory;
@@ -37,6 +38,8 @@ public class ResourceManager
 	public float m_ViewCenterX;
 	public float m_ViewCenterY;
 	
+	Line[] m_BorderLines;
+	
 	//Useful references ----------------------
 	public Blocksdroid m_Game;
 	public Engine m_Engine;
@@ -57,9 +60,6 @@ public class ResourceManager
 	
 	private Font m_TitleFont;
 	public Text m_TitleText;
-	
-	private BitmapTexture m_BgTexture;
-	public Sprite m_BgSprite;
 	
 	public ResourceManager()
 	{
@@ -96,8 +96,8 @@ public class ResourceManager
 		m_VBOManager = game.getVertexBufferObjectManager();
 		
 		long seed = new Date().getTime();
-		m_Random = new Random(seed);
-		//m_Random = new Random(8L); //for testing
+		//m_Random = new Random(seed);
+		m_Random = new Random(1399949427524L); //for testing
 		Debug.d("Using seed: " + seed);
 		
 		InitCommonResources();
@@ -173,40 +173,43 @@ public class ResourceManager
 		m_TitleText.setIgnoreUpdate(true);
 		//-------------------------------------------------------------
 		
-		//Bg ----------------------------------------------------------
-		try
-		{
-			m_BgTexture = new BitmapTexture
-				(
-					m_sInstance.m_TextureManager,
-					new IInputStreamOpener()
-					{
-						@Override
-						public InputStream open() throws IOException 
-						{
-							return m_sInstance.m_AssetManager.open("gfx/bg.png");
-						}
-					}
-				);
-			
-			m_BgTexture.load();
-		}
-		catch(IOException e)
-		{
-			Debug.e("Error while loading background image: " + e.getMessage());
-			return;
-		}
+		//Border lines ------------------------------------------------
+		m_BorderLines = new Line[4];
 		
-		m_BgSprite = new Sprite
-				(
-					ResourceManager.m_sInstance.m_ViewSize.x / 2.0f, 
-					ResourceManager.m_sInstance.m_ViewSize.y * 0.428f, 
-					ResourceManager.m_sInstance.m_ViewSize.x * 0.85f, 
-					ResourceManager.m_sInstance.m_ViewSize.y * 0.9f, 
-					TextureRegionFactory.extractFromTexture(m_BgTexture), 
-					m_sInstance.m_VBOManager
-				);
+		float borderW = m_sInstance.m_ViewSize.x * 0.82f;
+		float borderH = m_sInstance.m_ViewSize.y * 0.73f;
+		
+		float left = (m_sInstance.m_ViewSize.x - borderW) / 2.0f;
+		float right = left + borderW;
+		float bottom = (m_sInstance.m_ViewSize.y - borderH) / 2.0f - m_sInstance.m_ViewSize.y * 0.11f;
+		float top = bottom + borderH;
+				
+		m_BorderLines[0] = new Line(left, bottom, right, bottom, 1.0f, m_VBOManager);
+		m_BorderLines[1] = new Line(left, bottom, left, top, 1.0f, m_VBOManager);
+		m_BorderLines[2] = new Line(right, bottom, right, top, 1.0f, m_VBOManager);
+		m_BorderLines[3] = new Line(left, top, right, top, 1.0f, m_VBOManager);
+		
+		m_BorderLines[0].setColor(Color.WHITE);
+		m_BorderLines[1].setColor(Color.WHITE);
+		m_BorderLines[2].setColor(Color.WHITE);
+		m_BorderLines[3].setColor(Color.WHITE);
 		//-------------------------------------------------------------
+	}
+	
+	public void AttachBorderLines(Entity entity)
+	{
+		entity.attachChild(m_BorderLines[0]);
+		entity.attachChild(m_BorderLines[1]);
+		entity.attachChild(m_BorderLines[2]);
+		entity.attachChild(m_BorderLines[3]);
+	}
+	
+	public void DettachBorderLines()
+	{
+		m_BorderLines[0].detachSelf();
+		m_BorderLines[1].detachSelf();
+		m_BorderLines[2].detachSelf();
+		m_BorderLines[3].detachSelf();
 	}
 }
 

@@ -84,4 +84,16 @@ public class Blocksdroid extends BaseGameActivity
 	{
 		pOnPopulateSceneCallback.onPopulateSceneFinished();
 	}
+	
+	@Override
+	public synchronized void onPauseGame() 
+	{
+		super.onPauseGame();
+	}
+	
+	@Override
+	public synchronized void onResumeGame() 
+	{
+		super.onResumeGame();
+	}
 }

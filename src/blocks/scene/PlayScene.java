@@ -30,7 +30,7 @@ public class PlayScene extends GameScene
 		
 		this.sortChildren();
 		
-		m_BackLayer.attachChild(ResourceManager.m_sInstance.m_BgSprite);
+		ResourceManager.m_sInstance.AttachBorderLines(m_BackLayer);
 		
 		m_Match = new BlocksMatch();
 		m_Match.Init();
@@ -41,7 +41,7 @@ public class PlayScene extends GameScene
 	{
 		Debug.d("Unloading PlayScene");
 		
-		ResourceManager.m_sInstance.m_BgSprite.detachSelf();
+		ResourceManager.m_sInstance.DettachBorderLines();
 		
 		ResourceManager.m_sInstance.UnloadBlocks();
 	}
