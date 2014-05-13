@@ -58,7 +58,7 @@ public class BlockSpriteBatch extends DynamicSpriteBatch
 				sprite.getY() - sprite.getHeight() * 0.5f,
 				sprite.getWidth(),
 				sprite.getHeight(),
-				1.0f, 1.0f, 1.0f, 0.0f
+				1.0f, 1.0f, 1.0f, 1.0f
 			);
 	}
 }
