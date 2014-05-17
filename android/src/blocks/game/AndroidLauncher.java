@@ -1,7 +1,6 @@
 package blocks.game;
 
 import android.os.Bundle;
-import blocks.game.Blocksdroid;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;

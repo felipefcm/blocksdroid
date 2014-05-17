@@ -1,6 +1,8 @@
 
 package blocks.screen;
 
+import blocks.resource.ResourceManager;
+
 public class ScreenManager 
 {
 	public static ScreenManager m_sInstance = new ScreenManager();
@@ -10,9 +12,25 @@ public class ScreenManager
 		Play
 	}
 	
+//Screens ----------------------------------------------------------------
 	public PlayScreen m_PlayScreen;
+//------------------------------------------------------------------------
+	
+	public boolean Init()
+	{
+		//initial scene
+		m_sInstance.m_PlayScreen = new PlayScreen();
+		SetScreen(m_PlayScreen);
+		
+		return true;
+	}
 	
 	public void SetScreen(GameScreen screen)
+	{
+		ResourceManager.m_sInstance.m_Game.setScreen(screen);
+	}
+	
+	public void Dispose()
 	{
 	}
 }

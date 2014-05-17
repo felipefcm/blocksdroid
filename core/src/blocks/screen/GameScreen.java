@@ -9,7 +9,7 @@ public abstract class GameScreen implements Screen
 {	
 	public GameScreen()
 	{
-	}
+	}	
 	
 	public abstract ScreenType GetType();
 }
