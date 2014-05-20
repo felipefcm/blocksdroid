@@ -2,26 +2,22 @@
 package blocks.screen;
 
 import blocks.game.BlocksMatch;
-import blocks.resource.Point;
-import blocks.resource.ResourceManager;
 import blocks.screen.ScreenManager.ScreenType;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
-
 public class PlayScreen extends GameScreen 
-{
-	public OrthographicCamera m_Camera;
-	
+{	
 	private BlocksMatch m_Match;
 	
 	public PlayScreen() 
 	{
-		Point<Integer> viewSize = ResourceManager.m_sInstance.m_ViewSize;
-		
-		m_Camera = new OrthographicCamera(viewSize.x, viewSize.y);
-		m_Camera.update();
-		
 		m_Match = new BlocksMatch();
+	}
+	
+	public boolean Init()
+	{
+		m_Match.Init();
+		
+		return true;
 	}
 
 	@Override
@@ -32,7 +28,7 @@ public class PlayScreen extends GameScreen
 
 	@Override
 	public void resize(int width, int height) 
-	{	
+	{
 	}
 
 	@Override

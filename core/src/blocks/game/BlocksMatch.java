@@ -12,26 +12,15 @@ public class BlocksMatch
 	{
 		m_BlockGrid = new BlockGrid(NumRows, NumCols);
 	}
+		
+	public void Init()
+	{	
+		m_BlockGrid.Init();
+	}
 	
 	public void Render()
 	{
 		m_BlockGrid.Render();
-	}
-	
-	public void Init()
-	{	
-		//m_BlockGrid.setWidth(NumCols * Block.m_sBlockViewSize);
-		//m_BlockGrid.setHeight(NumRows * Block.m_sBlockViewSize);
-		
-		/*
-		m_BlockGrid.setPosition
-			(
-				ResourceManager.m_sInstance.m_ViewCenterX, 
-				ResourceManager.m_sInstance.m_ViewCenterY - Block.m_sBlockViewSize * 0.92f
-			);
-		*/
-		
-		m_BlockGrid.Init();
 	}
 	
 	public void Dispose()

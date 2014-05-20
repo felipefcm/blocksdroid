@@ -4,14 +4,19 @@ package blocks.resource;
 import java.util.Date;
 import java.util.Random;
 
+import blocks.game.Block;
 import blocks.game.Blocksdroid;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class ResourceManager 
 {
@@ -24,6 +29,9 @@ public class ResourceManager
 	public Random m_Random;
 	public Point<Integer> m_ScreenSize;
 	public Point<Integer> m_ViewSize;
+	public Viewport m_Viewport;
+	public OrthographicCamera m_Camera;
+	public ShapeRenderer m_ShapeRenderer;
 	//--------------------------------------------------------------------
 	
 	//Textures -----------------------------------------------------------
@@ -56,6 +64,11 @@ public class ResourceManager
 		m_ViewSize = new Point<Integer>(m_ScreenSize.x, (int)(m_ScreenSize.x / m_sGameAspectRatio));
 		Log.Write("View size: W=" + m_ViewSize.x + " H=" + m_ViewSize.y);
 		
+		m_Camera = new OrthographicCamera();
+		m_Viewport = new FitViewport(m_ViewSize.x, m_ViewSize.y, m_Camera);
+		
+		m_ShapeRenderer = new ShapeRenderer();
+		
 		if(!InitCommonResources())
 			return false;
 		
@@ -86,6 +99,8 @@ public class ResourceManager
 		m_GreenBlockFixedRegion = new TextureRegion(m_BlockTexture, 64, 64, 64, 64);
 		m_BlueBlockFixedRegion = new TextureRegion(m_BlockTexture, 128, 64, 64, 64);
 		m_OrangeBlockFixedRegion = new TextureRegion(m_BlockTexture, 192, 64, 64, 64);
+		
+		Block.m_sBlockViewSize = m_ViewSize.x * 0.15f;
 		//----------------------------------------------------------------
 		
 		return true;

@@ -19,7 +19,9 @@ public class ScreenManager
 	public boolean Init()
 	{
 		//initial scene
-		m_sInstance.m_PlayScreen = new PlayScreen();
+		m_PlayScreen = new PlayScreen();
+		m_PlayScreen.Init();
+		
 		SetScreen(m_PlayScreen);
 		
 		return true;

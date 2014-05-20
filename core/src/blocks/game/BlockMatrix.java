@@ -28,7 +28,7 @@ public class BlockMatrix
 	
 	public Block GetAt(Point<Integer> pos)
 	{
-		return m_Blocks[pos.y][pos.x];
+		return GetAt(pos.y, pos.x);
 	}
 	
 	public Block GetAt(int row, int col)

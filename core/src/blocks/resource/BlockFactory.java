@@ -8,13 +8,17 @@ public class BlockFactory
 {
 	public static Block GetBlock(BlockType type)
 	{	
-		return new Block(type);
+		Block newBlock = new Block(type);
+		
+		newBlock.setSize(Block.m_sBlockViewSize, Block.m_sBlockViewSize);
+		
+		return newBlock;
 	}
 	
 	public static Block GetRandomBlock()
 	{
 		int randomValue = ResourceManager.m_sInstance.m_Random.nextInt(BlockType.values().length);
 		
-		return new Block(BlockType.values()[randomValue]);
+		return GetBlock(BlockType.values()[randomValue]);
 	}
 }

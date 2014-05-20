@@ -5,7 +5,6 @@ import blocks.game.Block.BlockType;
 import blocks.resource.BlockFactory;
 import blocks.resource.Point;
 import blocks.resource.ResourceManager;
-import blocks.screen.ScreenManager;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -47,8 +46,6 @@ public class BlockGrid
 	
 	public void Init()
 	{
-		m_BlockBatch.setProjectionMatrix(ScreenManager.m_sInstance.m_PlayScreen.m_Camera.combined);
-		
 		//CreateNewFallingPiece();
 		
 		RandomizeGrid();
@@ -56,6 +53,8 @@ public class BlockGrid
 	
 	public void Render()
 	{
+		m_BlockBatch.setProjectionMatrix(ResourceManager.m_sInstance.m_Camera.combined);
+		
 		m_Matrix.Render(m_BlockBatch);
 	}
 	
@@ -71,11 +70,6 @@ public class BlockGrid
 	}
 	
 	private boolean InsertBlockInGrid(Block block)
-	{
-		return InsertBlockInGrid(block, true);
-	}
-	
-	private boolean InsertBlockInGrid(Block block, boolean updateBatch)
 	{
 		Point<Integer> blockGridPos = block.GetGridPos();
 		
@@ -93,7 +87,7 @@ public class BlockGrid
 		return true;
 	}
 
-	private void RemoveBlockFromGrid(Point<Integer> gridPos, boolean updateBatch)
+	private void RemoveBlockFromGrid(Point<Integer> gridPos)
 	{
 		if(m_Matrix.GetAt(gridPos) == null)
 			return;
@@ -103,7 +97,7 @@ public class BlockGrid
 		++m_EmptyPositions;
 	}
 	
-	private boolean MoveBlockInGrid(Block block, Point<Integer> dstGridPos, boolean updateBatch)
+	private boolean MoveBlockInGrid(Block block, Point<Integer> dstGridPos)
 	{
 		if(!IsGridPositionAvailable(dstGridPos))
 			return false;
@@ -125,7 +119,7 @@ public class BlockGrid
 		return true;
 	}
 	
-	private boolean SwapBlocksInGrid(Block blockA, Block blockB, boolean updateBatch)
+	private boolean SwapBlocksInGrid(Block blockA, Block blockB)
 	{
 		Point<Integer> aGridPos = blockA.GetGridPos();
 		Point<Integer> bGridPos = blockB.GetGridPos();
@@ -200,7 +194,7 @@ public class BlockGrid
 						break;
 				}
 				
-				MoveBlockInGrid(block, new Point<Integer>(j, k + 1), false);
+				MoveBlockInGrid(block, new Point<Integer>(j, k + 1));
 			}
 	}
 //------------------------------------------------------------------------
@@ -228,10 +222,10 @@ public class BlockGrid
 		InsertBlockInGrid(m_FallingPiece);
 	}
 	
-	private void MoveDownFallingPiece(Point<Integer> nextGridPos, boolean updateBatch)
+	private void MoveDownFallingPiece(Point<Integer> nextGridPos)
 	{
 		//'nextGridPos' is already checked by 'onTimePassed' function
-		MoveBlockInGrid(m_FallingPiece, nextGridPos, updateBatch);
+		MoveBlockInGrid(m_FallingPiece, nextGridPos);
 	}	
 //------------------------------------------------------------------------
 	
@@ -355,16 +349,16 @@ public class BlockGrid
 	
 	private void DestroyColumnGroup(int topMost, int col)
 	{
-		RemoveBlockFromGrid(new Point(col, topMost), false);
-		RemoveBlockFromGrid(new Point(col, topMost - 1), false);
-		RemoveBlockFromGrid(new Point(col, topMost - 2), false);
+		RemoveBlockFromGrid(new Point(col, topMost));
+		RemoveBlockFromGrid(new Point(col, topMost - 1));
+		RemoveBlockFromGrid(new Point(col, topMost - 2));
 	}
 	
 	private void DestroyRowGroup(int rightMost, int row)
 	{		
-		RemoveBlockFromGrid(new Point(rightMost, row), false);
-		RemoveBlockFromGrid(new Point(rightMost - 1, row), false);
-		RemoveBlockFromGrid(new Point(rightMost - 2, row), false);
+		RemoveBlockFromGrid(new Point(rightMost, row));
+		RemoveBlockFromGrid(new Point(rightMost - 1, row));
+		RemoveBlockFromGrid(new Point(rightMost - 2, row));
 	}
 //------------------------------------------------------------------------
 	
