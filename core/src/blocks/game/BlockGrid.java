@@ -6,8 +6,12 @@ import blocks.resource.BlockFactory;
 import blocks.resource.Point;
 import blocks.resource.ResourceManager;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 
 public class BlockGrid
 {
@@ -16,11 +20,19 @@ public class BlockGrid
 	private int m_NumCols;
 	private BlockMatrix m_Matrix;
 	
-	private SpriteBatch m_BlockBatch;
+	private Matrix4 m_FromGridToWorld;
+	private Matrix4 m_FromWorldToGrid;
+	
+	private SpriteBatch m_SpriteBatch;
+	private ShapeRenderer m_ShapeRenderer;
+	private Point<Integer> m_ViewSize;
 	
 	private Block m_FallingPiece;
 	
 	private int m_EmptyPositions;
+	
+	private float m_UpdateInterval;
+	private float m_UpdateTime;
 	
 	private final float m_MinTouchLength = Block.m_sBlockViewSize * 0.7f;
 	private final float m_MaxTouchLength = Block.m_sBlockViewSize * 1.6f;
@@ -39,28 +51,62 @@ public class BlockGrid
 		
 		m_Matrix = new BlockMatrix(numRows, numCols);
 		
-		m_BlockBatch = new SpriteBatch(numRows * numCols);
+		m_FromGridToWorld = new Matrix4();
 		
 		m_EmptyPositions = m_NumRows * m_NumCols;
+		
+		//time in seconds between updates
+		m_UpdateInterval = 0.4f;
+		
+		m_UpdateTime = 0;
 	}
 	
 	public void Init()
 	{
-		//CreateNewFallingPiece();
+		m_SpriteBatch = ResourceManager.m_sInstance.m_SpriteBatch;
+		m_ShapeRenderer = ResourceManager.m_sInstance.m_ShapeRenderer;
+		m_ViewSize = ResourceManager.m_sInstance.m_ViewSize;
 		
-		RandomizeGrid();
+		m_FromGridToWorld.trn(m_ViewSize.x * 0.125f, m_ViewSize.y * 0.022f, 0);
+		m_FromWorldToGrid = m_FromGridToWorld.cpy().inv();
+		
+		CreateNewFallingPiece();
+		
+		//RandomizeGrid();
 	}
 	
 	public void Render()
 	{
-		m_BlockBatch.setProjectionMatrix(ResourceManager.m_sInstance.m_Camera.combined);
+		m_UpdateTime += Gdx.graphics.getDeltaTime();
 		
-		m_Matrix.Render(m_BlockBatch);
+		if(m_UpdateTime >= m_UpdateInterval)
+		{
+			m_UpdateTime = 0;
+			UpdateGame();
+		}
+		
+		m_ShapeRenderer.begin(ShapeType.Line);
+		{
+			m_ShapeRenderer.setColor(0.75f, 0.75f, 0.75f, 1.0f);
+			m_ShapeRenderer.rect
+			(
+				m_ViewSize.x * 0.12f,
+				m_ViewSize.y * 0.018f,
+				m_ViewSize.x * 0.76f,
+				m_ViewSize.y * 0.685f
+			);
+		}
+		m_ShapeRenderer.end();
+		
+		m_SpriteBatch.setTransformMatrix(m_FromGridToWorld);
+		m_SpriteBatch.setProjectionMatrix(ResourceManager.m_sInstance.m_Camera.combined);
+		
+		m_Matrix.Render(m_SpriteBatch);
 	}
 	
 	public void Dispose()
 	{
-		m_BlockBatch.dispose();
+		m_SpriteBatch.dispose();
 	}
 	
 //Grid management --------------------------------------------------------
@@ -75,10 +121,8 @@ public class BlockGrid
 		
 		if(!IsGridPositionAvailable(blockGridPos))
 			return false;
-		
-		Vector2 pos = FromGridToWorld(blockGridPos);
-		
-		block.setPosition(pos.x, pos.y);
+				
+		block.setPosition(blockGridPos.x * Block.m_sBlockViewSize, blockGridPos.y * Block.m_sBlockViewSize);
 		
 		m_Matrix.SetBlockAt(block, blockGridPos);
 		
@@ -107,12 +151,10 @@ public class BlockGrid
 		if(m_Matrix.GetAt(srcGridPos) == null)
 			return false;
 		
-		Vector2 worldPos = FromGridToWorld(dstGridPos);
-		
 		m_Matrix.ClearPosition(srcGridPos);
 		
 		block.SetGridPos(dstGridPos);
-		block.setPosition(worldPos.x, worldPos.y);
+		block.setPosition(dstGridPos.x * Block.m_sBlockViewSize, dstGridPos.y * Block.m_sBlockViewSize);
 		
 		m_Matrix.SetBlockAt(block, dstGridPos);
 		
@@ -123,8 +165,6 @@ public class BlockGrid
 	{
 		Point<Integer> aGridPos = blockA.GetGridPos();
 		Point<Integer> bGridPos = blockB.GetGridPos();
-		Vector2 aWorldPos = FromGridToWorld(aGridPos);
-		Vector2 bWorldPos = FromGridToWorld(bGridPos);
 		
 		m_Matrix.SetBlockAt(blockB, aGridPos);
 		m_Matrix.SetBlockAt(blockA, bGridPos);
@@ -132,8 +172,8 @@ public class BlockGrid
 		blockA.SetGridPos(bGridPos);
 		blockB.SetGridPos(aGridPos);
 		
-		blockA.setPosition(bWorldPos.x, bWorldPos.y);
-		blockB.setPosition(aWorldPos.x, aWorldPos.y);
+		blockA.setPosition(bGridPos.x * Block.m_sBlockViewSize, bGridPos.y * Block.m_sBlockViewSize);
+		blockB.setPosition(aGridPos.x * Block.m_sBlockViewSize, aGridPos.y * Block.m_sBlockViewSize);
 		
 		return true;
 	}
@@ -146,7 +186,7 @@ public class BlockGrid
 		{
 			for(int j = 0; j < m_NumCols; ++j)
 			{
-				Block block = BlockFactory.GetRandomBlock();
+				Block block = BlockFactory.GetRandomBlock(BlockFactory.ENHANCED_BLOCKS);
 				
 				block.SetGridPos(j, i);
 				
@@ -155,21 +195,26 @@ public class BlockGrid
 		}
 	}
 	
-	private Vector2 FromGridToWorld(Point<Integer> gridPosition)
+	private Vector3 FromGridToWorld(Point<Integer> gridPosition)
 	{
-		return new Vector2
+		Vector3 blockPosInGridCoords = new Vector3
 				(
-					((float) gridPosition.x + 0.5f) * Block.m_sBlockViewSize,
-					((float) gridPosition.y + 0.5f) * Block.m_sBlockViewSize
+					gridPosition.x * Block.m_sBlockViewSize,
+					gridPosition.y * Block.m_sBlockViewSize,
+					0
 				);
+		
+		return blockPosInGridCoords.mul(m_FromGridToWorld);
 	}
 	
-	private Point<Integer> FromWorldToGrid(Vector2 worldPosition)
+	private Point<Integer> FromWorldToGrid(Vector3 worldPosition)
 	{
+		Vector3 blockPosInGridCoords = worldPosition.mul(m_FromWorldToGrid);
+		
 		return new Point<Integer>
 				(
-					(int)(worldPosition.x / Block.m_sBlockViewSize),
-					(int)(worldPosition.y / Block.m_sBlockViewSize)
+					(int)(blockPosInGridCoords.x / Block.m_sBlockViewSize),
+					(int)(blockPosInGridCoords.y / Block.m_sBlockViewSize)
 				);
 	}
 	
@@ -216,7 +261,7 @@ public class BlockGrid
 		}
 		while(!IsGridPositionAvailable(newPos));
 		
-		m_FallingPiece = BlockFactory.GetRandomBlock();
+		m_FallingPiece = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
 		m_FallingPiece.SetGridPos(newPos);
 		
 		InsertBlockInGrid(m_FallingPiece);
@@ -363,44 +408,35 @@ public class BlockGrid
 //------------------------------------------------------------------------
 	
 //Events -----------------------------------------------------------------
-	/*
-	@Override
-	public boolean onAreaTouched(TouchEvent touchEvent, float localX, float localY) 
-	{		
-		switch(touchEvent.getAction())
+	public void UpdateGame() 
+	{	
+		if(m_FallingPiece == null)
 		{
-			case TouchEvent.ACTION_DOWN:
-			{		
-				m_TouchMoveStartedPoint = new PointF(localX, localY);
-				
-				//this condition occurs when the touch move went out of grid
-				if(m_TouchMoving)
-					m_TouchMoving = false;
-			}
-			break;
-			
-			case TouchEvent.ACTION_UP:
-			{
-				if(m_TouchMoving)
-				{
-					m_TouchMoveFinishedPoint = new PointF(localX, localY);
-					OnTouchMoveFinished();
-				}
-				
-				m_TouchMoving = false;
-			}
-			break;
-				
-			case TouchEvent.ACTION_MOVE:
-			{
-				m_TouchMoving = true;
-			}
-			break;
+			return;
 		}
 		
-		return true;
+		Point<Integer> blockPos = m_FallingPiece.GetGridPos();
+		Point<Integer> nextPos = new Point<Integer>(blockPos.x, blockPos.y - 1);
+		
+		//Check if falling piece can fall another position
+		if(nextPos.y < 0 || !IsGridPositionAvailable(nextPos))
+		{
+			//Falling piece cannot fall anymore, place it
+			m_FallingPiece.m_IsPlaced = true;
+			m_FallingPiece = null;
+			
+			ProcessScoringConditions();
+			
+			CreateNewFallingPiece();
+		}
+		else
+		{
+			//it can
+			MoveDownFallingPiece(nextPos);
+		}
 	}
 	
+	/*
 	private void OnTouchMoveFinished()
 	{
 		float deltaX = m_TouchMoveFinishedPoint.x - m_TouchMoveStartedPoint.x;
@@ -485,44 +521,6 @@ public class BlockGrid
 			ProcessScoringConditions();
 			
 			m_BlocksBatch.UpdateBatch();
-		}
-	}
-	
-	@Override
-	protected final void onManagedUpdate(float pSecondsElapsed) 
-	{
-		super.onManagedUpdate(pSecondsElapsed);
-	}
-	
-	@Override
-	public void onTimePassed(TimerHandler pTimerHandler)
-
-	{
-		if(m_FallingPiece == null)
-		{
-			Debug.d("Falling piece null in 'onTimePassed', unregistering timer");
-			SceneManager.m_sInstance.GetCurrentScene().unregisterUpdateHandler(pTimerHandler);
-			return;
-		}
-		
-		Point blockPos = m_FallingPiece.GetGridPos();
-		Point nextPos = new Point(blockPos.x, blockPos.y - 1);
-		
-		//Check if falling piece can fall another position
-		if(nextPos.y < 0 || !IsGridPositionAvailable(nextPos))
-		{
-			//Falling piece cannot fall anymore, place it
-			m_FallingPiece.m_IsPlaced = true;
-			m_FallingPiece = null;
-			
-			ProcessScoringConditions();
-			
-			CreateNewFallingPiece();
-		}
-		else
-		{
-			//it can
-			MoveDownFallingPiece(nextPos, true);
 		}
 	}
 	*/

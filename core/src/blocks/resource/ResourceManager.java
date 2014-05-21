@@ -11,10 +11,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
+import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -24,17 +26,21 @@ public class ResourceManager
 	
 	public static final float m_sGameAspectRatio = 3.0f / 4.0f;
 	
-	//Useful references --------------------------------------------------
+//Useful references --------------------------------------------------
 	public Blocksdroid m_Game;
 	public Random m_Random;
 	public Point<Integer> m_ScreenSize;
 	public Point<Integer> m_ViewSize;
+	
 	public Viewport m_Viewport;
 	public OrthographicCamera m_Camera;
 	public ShapeRenderer m_ShapeRenderer;
-	//--------------------------------------------------------------------
+	public SpriteBatch m_SpriteBatch;
 	
-	//Textures -----------------------------------------------------------
+	public final Matrix4 m_IdentityMatrix = new Matrix4();
+//--------------------------------------------------------------------
+	
+//Textures -----------------------------------------------------------
 	public Texture m_BlockTexture;
 	public TextureRegion m_RedBlockRegion;
 	public TextureRegion m_GreenBlockRegion;
@@ -44,11 +50,12 @@ public class ResourceManager
 	public TextureRegion m_GreenBlockFixedRegion;
 	public TextureRegion m_BlueBlockFixedRegion;
 	public TextureRegion m_OrangeBlockFixedRegion;
-	//--------------------------------------------------------------------
+//--------------------------------------------------------------------
 	
-	//Fonts --------------------------------------------------------------
-	public BitmapFont m_BlockFont;
-	//--------------------------------------------------------------------
+//Fonts --------------------------------------------------------------
+	public BitmapFont m_BloxFont;
+	public BitmapFontCache m_BlocksdroidText;
+//--------------------------------------------------------------------
 	
 	public boolean Init(final Blocksdroid game)
 	{
@@ -66,8 +73,13 @@ public class ResourceManager
 		
 		m_Camera = new OrthographicCamera();
 		m_Viewport = new FitViewport(m_ViewSize.x, m_ViewSize.y, m_Camera);
+		m_Viewport.update(m_ScreenSize.x, m_ScreenSize.y, true);
+		
+		m_SpriteBatch = new SpriteBatch(80);
+		m_SpriteBatch.setProjectionMatrix(m_Camera.combined);
 		
 		m_ShapeRenderer = new ShapeRenderer();
+		m_ShapeRenderer.setProjectionMatrix(m_Camera.combined);
 		
 		if(!InitCommonResources())
 			return false;
@@ -77,17 +89,18 @@ public class ResourceManager
 	
 	private boolean InitCommonResources()
 	{		
-		//font -----------------------------------------------------------
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/blox.ttf"));
-		FreeTypeFontParameter fontParam = new FreeTypeFontParameter();
-		fontParam.size = 12;
-		fontParam.characters = "BLCKSDRI";
+	//font -----------------------------------------------------------
+		m_BloxFont = new BitmapFont(Gdx.files.internal("fonts/blox.fnt"));
+		m_BloxFont.setScale(m_ViewSize.x * 0.003f);
 		
-		m_BlockFont = generator.generateFont(fontParam);
-		generator.dispose();
-		//----------------------------------------------------------------
+		TextBounds bounds = m_BloxFont.getBounds("BLOCKSDROID");
+
+		m_BlocksdroidText = new BitmapFontCache(m_BloxFont);
+		m_BlocksdroidText.setColor(0.95f, 0.95f, 0.95f, 1.0f);
+		m_BlocksdroidText.addText("BLOCKSDROID", (m_ViewSize.x - bounds.width) / 2.0f, m_ViewSize.y * 0.98f);
+	//----------------------------------------------------------------
 		
-		//textures -------------------------------------------------------
+	//textures -------------------------------------------------------
 		m_BlockTexture = new Texture(Gdx.files.internal("gfx/blocks.png"));
 		
 		m_RedBlockRegion = new TextureRegion(m_BlockTexture, 0, 0, 64, 64);
@@ -101,7 +114,7 @@ public class ResourceManager
 		m_OrangeBlockFixedRegion = new TextureRegion(m_BlockTexture, 192, 64, 64, 64);
 		
 		Block.m_sBlockViewSize = m_ViewSize.x * 0.15f;
-		//----------------------------------------------------------------
+	//----------------------------------------------------------------
 		
 		return true;
 	}
@@ -109,7 +122,9 @@ public class ResourceManager
 	public void Dispose()
 	{
 		m_BlockTexture.dispose();
-		m_BlockFont.dispose();
+		m_BloxFont.dispose();
+		m_ShapeRenderer.dispose();
+		m_SpriteBatch.dispose();
 	}
 }
 

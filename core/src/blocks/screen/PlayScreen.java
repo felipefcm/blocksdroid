@@ -2,11 +2,15 @@
 package blocks.screen;
 
 import blocks.game.BlocksMatch;
+import blocks.resource.ResourceManager;
 import blocks.screen.ScreenManager.ScreenType;
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class PlayScreen extends GameScreen 
 {	
 	private BlocksMatch m_Match;
+	private SpriteBatch m_SpriteBatch;
 	
 	public PlayScreen() 
 	{
@@ -15,7 +19,9 @@ public class PlayScreen extends GameScreen
 	
 	public boolean Init()
 	{
-		m_Match.Init();
+		m_SpriteBatch = ResourceManager.m_sInstance.m_SpriteBatch;
+		
+		m_Match.Init();		
 		
 		return true;
 	}
@@ -23,6 +29,13 @@ public class PlayScreen extends GameScreen
 	@Override
 	public void render(float delta) 
 	{
+		m_SpriteBatch.setTransformMatrix(ResourceManager.m_sInstance.m_IdentityMatrix);
+		m_SpriteBatch.begin();
+		{
+			ResourceManager.m_sInstance.m_BlocksdroidText.draw(m_SpriteBatch);
+		}
+		m_SpriteBatch.end();
+		
 		m_Match.Render();
 	}
 
