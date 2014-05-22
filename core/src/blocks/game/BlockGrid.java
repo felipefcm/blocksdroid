@@ -3,17 +3,19 @@ package blocks.game;
 
 import blocks.game.Block.BlockType;
 import blocks.resource.BlockFactory;
+import blocks.resource.Log;
 import blocks.resource.Point;
 import blocks.resource.ResourceManager;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
-public class BlockGrid
+public class BlockGrid extends InputAdapter
 {
 //Member variables -------------------------------------------------------
 	private int m_NumRows;
@@ -34,6 +36,8 @@ public class BlockGrid
 	private float m_UpdateInterval;
 	private float m_UpdateTime;
 	
+	private Point<Integer> m_TouchMoveStartedPoint;
+	private Point<Integer> m_TouchMoveFinishedPoint;
 	private final float m_MinTouchLength = Block.m_sBlockViewSize * 0.7f;
 	private final float m_MaxTouchLength = Block.m_sBlockViewSize * 1.6f;
 	
@@ -56,9 +60,12 @@ public class BlockGrid
 		m_EmptyPositions = m_NumRows * m_NumCols;
 		
 		//time in seconds between updates
-		m_UpdateInterval = 0.4f;
-		
+		m_UpdateInterval = 0.3f;
+
 		m_UpdateTime = 0;
+		
+		m_TouchMoveStartedPoint = new Point<Integer>();
+		m_TouchMoveFinishedPoint = new Point<Integer>();
 	}
 	
 	public void Init()
@@ -70,9 +77,9 @@ public class BlockGrid
 		m_FromGridToWorld.trn(m_ViewSize.x * 0.125f, m_ViewSize.y * 0.022f, 0);
 		m_FromWorldToGrid = m_FromGridToWorld.cpy().inv();
 		
-		CreateNewFallingPiece();
+		Gdx.input.setInputProcessor(this);
 		
-		//RandomizeGrid();
+		CreateNewFallingPiece();
 	}
 	
 	public void Render()
@@ -436,40 +443,61 @@ public class BlockGrid
 		}
 	}
 	
-	/*
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button)
+	{
+		m_TouchMoveStartedPoint.x = screenX;
+		m_TouchMoveStartedPoint.y = screenY;
+		
+		return true;
+	}
+	
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button)
+	{
+		m_TouchMoveFinishedPoint.x = screenX;
+		m_TouchMoveFinishedPoint.y = screenY;
+		
+		OnTouchMoveFinished();
+
+		return true;
+	}
+		
 	private void OnTouchMoveFinished()
 	{
 		float deltaX = m_TouchMoveFinishedPoint.x - m_TouchMoveStartedPoint.x;
-		float deltaY = m_TouchMoveFinishedPoint.y - m_TouchMoveStartedPoint.y;
+		float deltaY = -(m_TouchMoveFinishedPoint.y - m_TouchMoveStartedPoint.y);
 		
 		float length = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 		
 		if(length >= m_MaxTouchLength)
 		{
-			Debug.d("Ignoring move because it has passed maximum length");
+			Log.Write("Ignoring move because it has passed maximum length");
 			return;
 		}
 		
 		if(Math.abs(deltaX) >= m_MinTouchLength && Math.abs(deltaY) >= m_MinTouchLength)
 		{
-			Debug.d("Ignoring move because it is ambiguous");
+			Log.Write("Ignoring move because it is ambiguous");
 			return;
 		}
 		
-		Point srcGridPos = FromWorldToGrid(m_TouchMoveStartedPoint);
+		Vector3 srcWorldPos = ResourceManager.m_sInstance.m_Viewport.unproject(new Vector3(m_TouchMoveStartedPoint.x, m_TouchMoveStartedPoint.y, 0));
+		
+		Point<Integer> srcGridPos = FromWorldToGrid(srcWorldPos);
 		
 		Block srcBlock = m_Matrix.GetAt(srcGridPos);
 		Block dstBlock = null;
 		
 		if(srcBlock == null)
 		{
-			Debug.d("Ignoring move because source block is null");
+			Log.Write("Ignoring move because source block is null");
 			return;
 		}
 		
 		if(!srcBlock.m_IsPlaced)
 		{
-			Debug.d("Ignoring move because source block is not placed (falling piece)");
+			Log.Write("Ignoring move because source block is not placed (falling piece)");
 			return;
 		}
 		
@@ -477,14 +505,14 @@ public class BlockGrid
 		{
 			if(deltaX > 0)
 			{
-				Debug.d("Moved right");
+				Log.Write("Moved right");
 				
 				if(srcGridPos.x < m_NumCols)
 					dstBlock = m_Matrix.GetAt(srcGridPos.y, srcGridPos.x + 1);
 			}
 			else
 			{
-				Debug.d("Moved left");
+				Log.Write("Moved left");
 				
 				if(srcGridPos.x > 0)
 					dstBlock = m_Matrix.GetAt(srcGridPos.y, srcGridPos.x - 1);
@@ -494,14 +522,14 @@ public class BlockGrid
 		{
 			if(deltaY > 0)
 			{
-				Debug.d("Moved up");
+				Log.Write("Moved up");
 				
 				if(srcGridPos.y < m_NumRows)
 					dstBlock = m_Matrix.GetAt(srcGridPos.y + 1, srcGridPos.x);
 			}
 			else
 			{
-				Debug.d("Moved down");
+				Log.Write("Moved down");
 				
 				if(srcGridPos.y > 0)
 					dstBlock = m_Matrix.GetAt(srcGridPos.y - 1, srcGridPos.x);
@@ -510,19 +538,16 @@ public class BlockGrid
 		
 		if(dstBlock == m_FallingPiece)
 		{
-			Debug.d("Ignoring block switch because destination piece is the falling piece");
+			Log.Write("Ignoring block switch because destination piece is the falling piece");
 			return;
 		}
 		
 		if(dstBlock != null)
 		{			
-			SwapBlocksInGrid(srcBlock, dstBlock, true);
+			SwapBlocksInGrid(srcBlock, dstBlock);
 			
 			ProcessScoringConditions();
-			
-			m_BlocksBatch.UpdateBatch();
 		}
 	}
-	*/
 //------------------------------------------------------------------------
 }
