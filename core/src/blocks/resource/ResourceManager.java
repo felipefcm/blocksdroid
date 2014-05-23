@@ -55,6 +55,8 @@ public class ResourceManager
 //Fonts --------------------------------------------------------------
 	public BitmapFont m_BloxFont;
 	public BitmapFontCache m_BlocksdroidText;
+	public BitmapFont m_AckFont;
+	public BitmapFontCache m_ScoreText;
 //--------------------------------------------------------------------
 	
 	public boolean Init(final Blocksdroid game)
@@ -93,11 +95,18 @@ public class ResourceManager
 		m_BloxFont = new BitmapFont(Gdx.files.internal("fonts/blox.fnt"));
 		m_BloxFont.setScale(m_ViewSize.x * 0.003f);
 		
+		m_AckFont = new BitmapFont(Gdx.files.internal("fonts/ack.fnt"));
+		m_AckFont.setScale(m_ViewSize.x * 0.0009f);
+		
 		TextBounds bounds = m_BloxFont.getBounds("BLOCKSDROID");
 
 		m_BlocksdroidText = new BitmapFontCache(m_BloxFont);
 		m_BlocksdroidText.setColor(0.95f, 0.95f, 0.95f, 1.0f);
 		m_BlocksdroidText.addText("BLOCKSDROID", (m_ViewSize.x - bounds.width) / 2.0f, m_ViewSize.y * 0.98f);
+		
+		m_ScoreText = new BitmapFontCache(m_AckFont);
+		m_ScoreText.setColor(0.95f, 0.95f, 0.95f, 1.0f);
+		m_ScoreText.addText("SCORE:",  m_ViewSize.x * 0.125f, m_ViewSize.y * 0.74f);
 	//----------------------------------------------------------------
 		
 	//textures -------------------------------------------------------

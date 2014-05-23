@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class BlockGrid extends InputAdapter
@@ -21,6 +22,8 @@ public class BlockGrid extends InputAdapter
 	private int m_NumRows;
 	private int m_NumCols;
 	private BlockMatrix m_Matrix;
+	
+	private BlocksMatch m_Match;
 	
 	private Matrix4 m_FromGridToWorld;
 	private Matrix4 m_FromWorldToGrid;
@@ -36,10 +39,12 @@ public class BlockGrid extends InputAdapter
 	private float m_UpdateInterval;
 	private float m_UpdateTime;
 	
+	private SwapLine m_SwapLine;
+	
 	private Point<Integer> m_TouchMoveStartedPoint;
 	private Point<Integer> m_TouchMoveFinishedPoint;
-	private final float m_MinTouchLength = Block.m_sBlockViewSize * 0.7f;
-	private final float m_MaxTouchLength = Block.m_sBlockViewSize * 1.6f;
+	private final float m_MinTouchLength = Block.m_sBlockViewSize * 0.5f;
+	private final float m_MaxTouchLength = Block.m_sBlockViewSize * 3.0f;
 	
 	public enum MoveDirection
 	{
@@ -48,10 +53,12 @@ public class BlockGrid extends InputAdapter
 	}
 //------------------------------------------------------------------------
 
-	public BlockGrid(int numRows, int numCols)
+	public BlockGrid(int numRows, int numCols, BlocksMatch match)
 	{
 		m_NumRows = numRows;
 		m_NumCols = numCols;
+		
+		m_Match = match;
 		
 		m_Matrix = new BlockMatrix(numRows, numCols);
 		
@@ -63,6 +70,8 @@ public class BlockGrid extends InputAdapter
 		m_UpdateInterval = 0.3f;
 
 		m_UpdateTime = 0;
+		
+		m_SwapLine = new SwapLine();
 		
 		m_TouchMoveStartedPoint = new Point<Integer>();
 		m_TouchMoveFinishedPoint = new Point<Integer>();
@@ -109,6 +118,9 @@ public class BlockGrid extends InputAdapter
 		m_SpriteBatch.setProjectionMatrix(ResourceManager.m_sInstance.m_Camera.combined);
 		
 		m_Matrix.Render(m_SpriteBatch);
+		
+		if(m_SwapLine.m_IsVisible)
+			m_SwapLine.Render(m_ShapeRenderer);
 	}
 	
 	public void Dispose()
@@ -143,7 +155,7 @@ public class BlockGrid extends InputAdapter
 		if(m_Matrix.GetAt(gridPos) == null)
 			return;
 		
-		m_Matrix.ClearPosition(gridPos);
+		m_Matrix.DisposeBlock(gridPos);
 		
 		++m_EmptyPositions;
 	}
@@ -211,12 +223,12 @@ public class BlockGrid extends InputAdapter
 					0
 				);
 		
-		return blockPosInGridCoords.mul(m_FromGridToWorld);
+		return blockPosInGridCoords.cpy().mul(m_FromGridToWorld);
 	}
 	
 	private Point<Integer> FromWorldToGrid(Vector3 worldPosition)
 	{
-		Vector3 blockPosInGridCoords = worldPosition.mul(m_FromWorldToGrid);
+		Vector3 blockPosInGridCoords = worldPosition.cpy().mul(m_FromWorldToGrid);
 		
 		return new Point<Integer>
 				(
@@ -298,6 +310,7 @@ public class BlockGrid extends InputAdapter
 				if(colEliminationPos != -1)
 				{
 					DestroyColumnGroup(colEliminationPos, col);
+					m_Match.IncrementScore(1);
 					MoveDownPlacedBlocks(); //TODO check if can move down only that column
 					
 					hadColumnDestruction = true;
@@ -312,6 +325,7 @@ public class BlockGrid extends InputAdapter
 				if(rowEliminationPos != -1)
 				{
 					DestroyRowGroup(rowEliminationPos, row);
+					m_Match.IncrementScore(1);
 					MoveDownPlacedBlocks(); //TODO check if can move down only three columns
 					
 					hadRowDestruction = true;
@@ -422,6 +436,8 @@ public class BlockGrid extends InputAdapter
 			return;
 		}
 		
+		ProcessScoringConditions();
+		
 		Point<Integer> blockPos = m_FallingPiece.GetGridPos();
 		Point<Integer> nextPos = new Point<Integer>(blockPos.x, blockPos.y - 1);
 		
@@ -465,8 +481,14 @@ public class BlockGrid extends InputAdapter
 		
 	private void OnTouchMoveFinished()
 	{
-		float deltaX = m_TouchMoveFinishedPoint.x - m_TouchMoveStartedPoint.x;
-		float deltaY = -(m_TouchMoveFinishedPoint.y - m_TouchMoveStartedPoint.y);
+		Vector3 srcWorldPos = ResourceManager.m_sInstance.m_Viewport.unproject(new Vector3(m_TouchMoveStartedPoint.x, m_TouchMoveStartedPoint.y, 0));
+		Vector3 dstWorldPos = ResourceManager.m_sInstance.m_Viewport.unproject(new Vector3(m_TouchMoveFinishedPoint.x, m_TouchMoveFinishedPoint.y, 0));
+		
+		Point<Integer> srcGridPos = FromWorldToGrid(srcWorldPos);
+		//Point<Integer> dstGridPos = FromWorldToGrid(dstWorldPos);
+		
+		float deltaX = dstWorldPos.x - srcWorldPos.x;
+		float deltaY = dstWorldPos.y - srcWorldPos.y;
 		
 		float length = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 		
@@ -482,9 +504,7 @@ public class BlockGrid extends InputAdapter
 			return;
 		}
 		
-		Vector3 srcWorldPos = ResourceManager.m_sInstance.m_Viewport.unproject(new Vector3(m_TouchMoveStartedPoint.x, m_TouchMoveStartedPoint.y, 0));
-		
-		Point<Integer> srcGridPos = FromWorldToGrid(srcWorldPos);
+		m_SwapLine.CreateLine(new Vector2(srcWorldPos.x, srcWorldPos.y), new Vector2(dstWorldPos.x, dstWorldPos.y));
 		
 		Block srcBlock = m_Matrix.GetAt(srcGridPos);
 		Block dstBlock = null;
@@ -545,8 +565,6 @@ public class BlockGrid extends InputAdapter
 		if(dstBlock != null)
 		{			
 			SwapBlocksInGrid(srcBlock, dstBlock);
-			
-			ProcessScoringConditions();
 		}
 	}
 //------------------------------------------------------------------------

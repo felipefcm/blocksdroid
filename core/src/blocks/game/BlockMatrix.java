@@ -1,6 +1,7 @@
 
 package blocks.game;
 
+import blocks.resource.BlockFactory;
 import blocks.resource.Point;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -44,5 +45,14 @@ public class BlockMatrix
 	public void ClearPosition(Point<Integer> pos)
 	{
 		m_Blocks[pos.y][pos.x] = null;
+	}
+	
+	public void DisposeBlock(Point<Integer> pos)
+	{
+		Block block = m_Blocks[pos.y][pos.x];
+		
+		m_Blocks[pos.y][pos.x] = null;
+		
+		BlockFactory.PoolBlock(block);
 	}
 }
