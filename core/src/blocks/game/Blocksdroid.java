@@ -29,12 +29,14 @@ public class Blocksdroid extends Game
 			Log.Write("Failed to init ScreenManager");
 		
 		m_ShapeRenderer = ResourceManager.m_sInstance.m_ShapeRenderer;
+		
+		Gdx.gl.glClearColor(0, 0, 0, 0);
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
 	@Override
 	public void render() 
 	{
-		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		//paints the viewport area
@@ -57,6 +59,7 @@ public class Blocksdroid extends Game
 	public void resize(int width, int height) 
 	{
 		ResourceManager.m_sInstance.m_Viewport.update(width, height, true);
+		
 		m_ShapeRenderer.setProjectionMatrix(ResourceManager.m_sInstance.m_Camera.combined);
 		
 		super.resize(width, height);
@@ -65,7 +68,6 @@ public class Blocksdroid extends Game
 	@Override
 	public void dispose() 
 	{
-		//won't call super.dispose() because ScreenManager should do it
 		ScreenManager.m_sInstance.Dispose();
 		ResourceManager.m_sInstance.Dispose();
 	}

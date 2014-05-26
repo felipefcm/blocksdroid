@@ -1,6 +1,7 @@
 
 package blocks.screen;
 
+import blocks.game.Blocksdroid;
 import blocks.resource.ResourceManager;
 
 public class ScreenManager 
@@ -9,30 +10,39 @@ public class ScreenManager
 	
 	public enum ScreenType
 	{
+		MainMenu,
 		Play
 	}
 	
-//Screens ----------------------------------------------------------------
-	public PlayScreen m_PlayScreen;
-//------------------------------------------------------------------------
+	private Blocksdroid m_Game;
+	private GameScreen m_CurrentScreen;
+	
+	public ScreenManager()
+	{
+		m_CurrentScreen = null;		
+	}
 	
 	public boolean Init()
 	{
-		//initial scene
-		m_PlayScreen = new PlayScreen();
-		m_PlayScreen.Init();
+		m_Game = ResourceManager.m_sInstance.m_Game;
 		
-		SetScreen(m_PlayScreen);
+		//initial scene
+		SetScreen(new MainMenuScreen());
 		
 		return true;
 	}
 	
 	public void SetScreen(GameScreen screen)
 	{
-		ResourceManager.m_sInstance.m_Game.setScreen(screen);
+		m_CurrentScreen = screen;
+		
+		//setScreen already calls hide() in the old screen
+		m_Game.setScreen(screen);
 	}
 	
 	public void Dispose()
 	{
+		if(m_CurrentScreen != null)
+			m_CurrentScreen.hide();
 	}
 }

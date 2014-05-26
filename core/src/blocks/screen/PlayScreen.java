@@ -17,13 +17,12 @@ public class PlayScreen extends GameScreen
 		m_Match = new BlocksMatch();
 	}
 	
-	public boolean Init()
-	{
+	@Override
+	public void show() 
+	{	
 		m_SpriteBatch = ResourceManager.m_sInstance.m_SpriteBatch;
 		
-		m_Match.Init();		
-		
-		return true;
+		m_Match.Init();
 	}
 
 	@Override
@@ -45,13 +44,9 @@ public class PlayScreen extends GameScreen
 	}
 
 	@Override
-	public void show() 
-	{	
-	}
-
-	@Override
 	public void hide() 
 	{	
+		dispose();
 	}
 
 	@Override

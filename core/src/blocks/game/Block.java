@@ -20,7 +20,8 @@ public class Block extends Sprite
 	}
 	
 	public boolean m_IsPlaced;
-	public boolean m_IsFixed;
+	
+	private boolean m_IsFixed;
 	
 	private BlockType m_Type;
 	
@@ -99,6 +100,18 @@ public class Block extends Sprite
 	public BlockType GetType()
 	{
 		return m_Type;
+	}
+	
+	public void SetFixed(boolean fixed)
+	{
+		m_IsFixed = fixed;
+		
+		ApplyTexture();
+	}
+	
+	public boolean IsFixed()
+	{
+		return m_IsFixed;
 	}
 	
 	public void SetType(BlockType type)

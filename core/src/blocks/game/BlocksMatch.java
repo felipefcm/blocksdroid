@@ -48,6 +48,11 @@ public class BlocksMatch
 		m_Score += inc;
 	}
 	
+	public int GetScore()
+	{
+		return m_Score;
+	}
+	
 	public void Dispose()
 	{
 		m_BlockGrid.Dispose();

@@ -50,6 +50,10 @@ public class ResourceManager
 	public TextureRegion m_GreenBlockFixedRegion;
 	public TextureRegion m_BlueBlockFixedRegion;
 	public TextureRegion m_OrangeBlockFixedRegion;
+	
+	public Texture m_MainSkinTexture;
+	public TextureRegion m_ButtonUpRegion;
+	public TextureRegion m_ButtonDownRegion;
 //--------------------------------------------------------------------
 	
 //Fonts --------------------------------------------------------------
@@ -123,6 +127,11 @@ public class ResourceManager
 		m_OrangeBlockFixedRegion = new TextureRegion(m_BlockTexture, 192, 64, 64, 64);
 		
 		Block.m_sBlockViewSize = m_ViewSize.x * 0.15f;
+		
+		m_MainSkinTexture = new Texture(Gdx.files.internal("gfx/UI/main_skin.png"));
+		
+		m_ButtonUpRegion = new TextureRegion(m_MainSkinTexture, 0, 0, 128, 32);
+		m_ButtonDownRegion = new TextureRegion(m_MainSkinTexture, 0, 32, 128, 32);
 	//----------------------------------------------------------------
 		
 		return true;
@@ -131,6 +140,7 @@ public class ResourceManager
 	public void Dispose()
 	{
 		m_BlockTexture.dispose();
+		m_MainSkinTexture.dispose();
 		m_BloxFont.dispose();
 		m_ShapeRenderer.dispose();
 		m_SpriteBatch.dispose();

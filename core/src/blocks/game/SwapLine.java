@@ -1,6 +1,8 @@
 
 package blocks.game;
 
+import blocks.resource.ResourceManager;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -10,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 public class SwapLine
 {
 	public boolean m_IsVisible;
+	public boolean m_WrongMove;
 	
 	private float m_Duration;
 	private float m_Elapsed;
@@ -21,14 +24,20 @@ public class SwapLine
 	public SwapLine()
 	{
 		m_IsVisible = false;
-		m_Duration = 0.8f;
+		m_Duration = 0.6f;
 	}
 	
 	public void CreateLine(Vector2 startPoint, Vector2 endPoint)
 	{
+		CreateLine(startPoint, endPoint, false);
+	}
+	
+	public void CreateLine(Vector2 startPoint, Vector2 endPoint, boolean wrongMove)
+	{
 		if(m_IsVisible)
 			return;
 		
+		m_WrongMove = wrongMove;
 		m_StartPoint = startPoint;
 		m_EndPoint = endPoint;
 		
@@ -51,12 +60,15 @@ public class SwapLine
 		m_Alpha = 1.0f - m_Elapsed / m_Duration;
 		
 		Gdx.gl.glEnable(GL20.GL_BLEND);
-		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-		Gdx.gl.glLineWidth(4.0f);
+		Gdx.gl.glLineWidth(ResourceManager.m_sInstance.m_ViewSize.y * 0.00625f);
 		
 		shapeRenderer.begin(ShapeType.Line);
 		{
-			shapeRenderer.setColor(1.0f, 1.0f, 1.0f, m_Alpha);
+			if(!m_WrongMove)
+				shapeRenderer.setColor(0.0f, 0.0f, 1.0f, m_Alpha);
+			else
+				shapeRenderer.setColor(1.0f, 0.0f, 0.0f, m_Alpha);
+			
 			shapeRenderer.line(m_StartPoint.x, m_StartPoint.y, m_EndPoint.x, m_EndPoint.y);
 		}
 		shapeRenderer.end();

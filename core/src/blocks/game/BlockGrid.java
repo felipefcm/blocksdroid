@@ -280,7 +280,11 @@ public class BlockGrid extends InputAdapter
 		}
 		while(!IsGridPositionAvailable(newPos));
 		
-		m_FallingPiece = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
+		if(m_Match.GetScore() < 50)
+			m_FallingPiece = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
+		else
+			m_FallingPiece = BlockFactory.GetRandomBlock(BlockFactory.ENHANCED_BLOCKS);
+		
 		m_FallingPiece.SetGridPos(newPos);
 		
 		InsertBlockInGrid(m_FallingPiece);
@@ -504,8 +508,6 @@ public class BlockGrid extends InputAdapter
 			return;
 		}
 		
-		m_SwapLine.CreateLine(new Vector2(srcWorldPos.x, srcWorldPos.y), new Vector2(dstWorldPos.x, dstWorldPos.y));
-		
 		Block srcBlock = m_Matrix.GetAt(srcGridPos);
 		Block dstBlock = null;
 		
@@ -521,18 +523,24 @@ public class BlockGrid extends InputAdapter
 			return;
 		}
 		
+		if(srcBlock.IsFixed())
+		{
+			Log.Write("Ignoring move because source block is fixed");
+			return;
+		}
+		
 		if(Math.abs(deltaX) >= m_MinTouchLength)
 		{
 			if(deltaX > 0)
 			{
-				Log.Write("Moved right");
+				//Log.Write("Moved right");
 				
 				if(srcGridPos.x < m_NumCols)
 					dstBlock = m_Matrix.GetAt(srcGridPos.y, srcGridPos.x + 1);
 			}
 			else
 			{
-				Log.Write("Moved left");
+				//Log.Write("Moved left");
 				
 				if(srcGridPos.x > 0)
 					dstBlock = m_Matrix.GetAt(srcGridPos.y, srcGridPos.x - 1);
@@ -542,18 +550,31 @@ public class BlockGrid extends InputAdapter
 		{
 			if(deltaY > 0)
 			{
-				Log.Write("Moved up");
+				//Log.Write("Moved up");
 				
 				if(srcGridPos.y < m_NumRows)
 					dstBlock = m_Matrix.GetAt(srcGridPos.y + 1, srcGridPos.x);
 			}
 			else
 			{
-				Log.Write("Moved down");
+				//Log.Write("Moved down");
 				
 				if(srcGridPos.y > 0)
 					dstBlock = m_Matrix.GetAt(srcGridPos.y - 1, srcGridPos.x);
 			}
+		}
+		
+		if(dstBlock == null)
+		{
+			Log.Write("Ignoring move because there is no destination piece");
+			return;
+		}
+		
+		if(dstBlock.IsFixed())
+		{
+			Log.Write("Ignoring move because destination block is fixed");
+			m_SwapLine.CreateLine(new Vector2(srcWorldPos.x, srcWorldPos.y), new Vector2(dstWorldPos.x, dstWorldPos.y), true);
+			return;
 		}
 		
 		if(dstBlock == m_FallingPiece)
@@ -562,10 +583,13 @@ public class BlockGrid extends InputAdapter
 			return;
 		}
 		
-		if(dstBlock != null)
-		{			
-			SwapBlocksInGrid(srcBlock, dstBlock);
-		}
+		m_SwapLine.CreateLine(new Vector2(srcWorldPos.x, srcWorldPos.y), new Vector2(dstWorldPos.x, dstWorldPos.y));
+		
+		//we can finally switch the blocks
+		SwapBlocksInGrid(srcBlock, dstBlock);
+		
+		srcBlock.SetFixed(true);
+		dstBlock.SetFixed(true);
 	}
 //------------------------------------------------------------------------
 }
