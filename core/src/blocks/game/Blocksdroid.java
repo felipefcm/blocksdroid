@@ -42,7 +42,8 @@ public class Blocksdroid extends Game
 		//paints the viewport area
 		m_ShapeRenderer.begin(ShapeType.Filled);
 		{
-			m_ShapeRenderer.setColor(0.2f, 0.2f, 0.2f, 1.0f);
+			//m_ShapeRenderer.setColor(0.3372f, 0.3921f, 0.447f, 1.0f); //Midnight blue
+			m_ShapeRenderer.setColor(0.2039f, 0.2863f, 0.3686f, 1.0f); //Wet asphalt
 			m_ShapeRenderer.rect
 			(
 				0, 0,

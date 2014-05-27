@@ -17,10 +17,13 @@ public class BlocksMatch
 	
 	private int m_Score;
 	
+	public float m_GameSpeed;
+	
 	public BlocksMatch()
 	{
 		m_BlockGrid = new BlockGrid(NumRows, NumCols, this);
 		m_Score = 0;
+		m_GameSpeed = 0.8f;
 	}
 		
 	public void Init()
@@ -46,6 +49,23 @@ public class BlocksMatch
 	public void IncrementScore(int inc)
 	{
 		m_Score += inc;
+		
+		if(m_Score < 30)
+			m_GameSpeed = 0.8f;
+		else
+			if(m_Score < 60)
+				m_GameSpeed = 0.6f;
+			else
+				if(m_Score < 90)
+					m_GameSpeed = 0.4f;
+				else
+					if(m_Score < 120)
+						m_GameSpeed = 0.3f;
+					else
+						if(m_Score < 150)
+							m_GameSpeed = 0.2f;
+						else
+							m_GameSpeed = 0.1f;
 	}
 	
 	public int GetScore()

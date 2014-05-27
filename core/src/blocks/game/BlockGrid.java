@@ -36,7 +36,6 @@ public class BlockGrid extends InputAdapter
 	
 	private int m_EmptyPositions;
 	
-	private float m_UpdateInterval;
 	private float m_UpdateTime;
 	
 	private SwapLine m_SwapLine;
@@ -65,9 +64,6 @@ public class BlockGrid extends InputAdapter
 		m_FromGridToWorld = new Matrix4();
 		
 		m_EmptyPositions = m_NumRows * m_NumCols;
-		
-		//time in seconds between updates
-		m_UpdateInterval = 0.3f;
 
 		m_UpdateTime = 0;
 		
@@ -95,7 +91,7 @@ public class BlockGrid extends InputAdapter
 	{
 		m_UpdateTime += Gdx.graphics.getDeltaTime();
 		
-		if(m_UpdateTime >= m_UpdateInterval)
+		if(m_UpdateTime >= m_Match.m_GameSpeed)
 		{
 			m_UpdateTime = 0;
 			UpdateGame();

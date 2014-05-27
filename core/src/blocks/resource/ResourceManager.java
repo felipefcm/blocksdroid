@@ -10,6 +10,7 @@ import blocks.game.Blocksdroid;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
@@ -97,7 +98,8 @@ public class ResourceManager
 	{		
 	//font -----------------------------------------------------------
 		m_BloxFont = new BitmapFont(Gdx.files.internal("fonts/blox.fnt"));
-		m_BloxFont.setScale(m_ViewSize.x * 0.003f);
+		m_BloxFont.setScale(m_ViewSize.x * 0.0035f);
+		m_BloxFont.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		m_AckFont = new BitmapFont(Gdx.files.internal("fonts/ack.fnt"));
 		m_AckFont.setScale(m_ViewSize.x * 0.0009f);
@@ -137,11 +139,17 @@ public class ResourceManager
 		return true;
 	}
 	
+	public void DisposeCommonResources()
+	{
+		m_MainSkinTexture.dispose();
+		m_BlockTexture.dispose();
+		m_BloxFont.dispose();
+	}
+	
 	public void Dispose()
 	{
-		m_BlockTexture.dispose();
-		m_MainSkinTexture.dispose();
-		m_BloxFont.dispose();
+		DisposeCommonResources();
+		
 		m_ShapeRenderer.dispose();
 		m_SpriteBatch.dispose();
 	}
