@@ -11,7 +11,8 @@ public class ScreenManager
 	public enum ScreenType
 	{
 		MainMenu,
-		Play
+		Play,
+		Tutorial
 	}
 	
 	private Blocksdroid m_Game;

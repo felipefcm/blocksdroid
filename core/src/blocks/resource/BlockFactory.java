@@ -21,7 +21,10 @@ public class BlockFactory
 		if(m_sBlockPool.size > 0)
 		{
 			newBlock = m_sBlockPool.pop();
+			
 			newBlock.SetType(type);
+			newBlock.m_IsPlaced = false;
+			newBlock.SetFixed(false);
 		}
 		else
 		{

@@ -107,11 +107,11 @@ public class ResourceManager
 		TextBounds bounds = m_BloxFont.getBounds("BLOCKSDROID");
 
 		m_BlocksdroidText = new BitmapFontCache(m_BloxFont);
-		m_BlocksdroidText.setColor(0.95f, 0.95f, 0.95f, 1.0f);
+		m_BlocksdroidText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
 		m_BlocksdroidText.addText("BLOCKSDROID", (m_ViewSize.x - bounds.width) / 2.0f, m_ViewSize.y * 0.98f);
 		
 		m_ScoreText = new BitmapFontCache(m_AckFont);
-		m_ScoreText.setColor(0.95f, 0.95f, 0.95f, 1.0f);
+		m_ScoreText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
 		m_ScoreText.addText("SCORE:",  m_ViewSize.x * 0.125f, m_ViewSize.y * 0.74f);
 	//----------------------------------------------------------------
 		

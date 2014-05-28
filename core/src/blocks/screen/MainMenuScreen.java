@@ -68,7 +68,7 @@ public class MainMenuScreen extends GameScreen
 		m_LabelStyle = new LabelStyle
 		(
 			ResourceManager.m_sInstance.m_BloxFont, 
-			new Color(Color.rgba8888(0.9372f, 0.9529f, 0.9529f, 1.0f))
+			new Color(Color.rgba8888(0.93f, 0.95f, 0.95f, 1.0f))
 		);
 		
 		m_TitleLabel = new Label("BLOCKSDROID", m_LabelStyle);
@@ -96,7 +96,7 @@ public class MainMenuScreen extends GameScreen
 				@Override
 				public void clicked(InputEvent event, float x, float y)
 				{
-					
+					ScreenManager.m_sInstance.SetScreen(new TutorialScreen());
 				}
 			}
 		);
@@ -120,7 +120,8 @@ public class MainMenuScreen extends GameScreen
 				@Override
 				public void clicked(InputEvent event, float x, float y)
 				{
-					
+					dispose();
+					ResourceManager.m_sInstance.m_Game.OnExit();
 				}
 			}
 		);

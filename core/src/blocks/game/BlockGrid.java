@@ -485,7 +485,7 @@ public class BlockGrid extends InputAdapter
 		Vector3 dstWorldPos = ResourceManager.m_sInstance.m_Viewport.unproject(new Vector3(m_TouchMoveFinishedPoint.x, m_TouchMoveFinishedPoint.y, 0));
 		
 		Point<Integer> srcGridPos = FromWorldToGrid(srcWorldPos);
-		//Point<Integer> dstGridPos = FromWorldToGrid(dstWorldPos);
+		Point<Integer> dstGridPos = FromWorldToGrid(dstWorldPos);
 		
 		float deltaX = dstWorldPos.x - srcWorldPos.x;
 		float deltaY = dstWorldPos.y - srcWorldPos.y;
@@ -516,12 +516,6 @@ public class BlockGrid extends InputAdapter
 		if(!srcBlock.m_IsPlaced)
 		{
 			Log.Write("Ignoring move because source block is not placed (falling piece)");
-			return;
-		}
-		
-		if(srcBlock.IsFixed())
-		{
-			Log.Write("Ignoring move because source block is fixed");
 			return;
 		}
 		
@@ -566,26 +560,37 @@ public class BlockGrid extends InputAdapter
 			return;
 		}
 		
-		if(dstBlock.IsFixed())
-		{
-			Log.Write("Ignoring move because destination block is fixed");
-			m_SwapLine.CreateLine(new Vector2(srcWorldPos.x, srcWorldPos.y), new Vector2(dstWorldPos.x, dstWorldPos.y), true);
-			return;
-		}
-		
 		if(dstBlock == m_FallingPiece)
 		{
 			Log.Write("Ignoring block switch because destination piece is the falling piece");
 			return;
 		}
 		
-		m_SwapLine.CreateLine(new Vector2(srcWorldPos.x, srcWorldPos.y), new Vector2(dstWorldPos.x, dstWorldPos.y));
+		boolean wrongMove = false;
+		
+		if(wrongMove = srcBlock.IsFixed() || dstBlock.IsFixed())
+		{
+			Log.Write("Ignoring move because src and/or dst block is fixed");
+		}
+		
+		Vector3 srcCornerWorld = FromGridToWorld(srcGridPos);
+		Vector3 dstCornerWorld = FromGridToWorld(dstGridPos);
+		
+		m_SwapLine.CreateLine
+		(
+			new Vector2(srcCornerWorld.x + Block.m_sBlockViewSize * 0.5f, srcCornerWorld.y + Block.m_sBlockViewSize * 0.5f), 
+			new Vector2(dstCornerWorld.x + Block.m_sBlockViewSize * 0.5f, dstCornerWorld.y + Block.m_sBlockViewSize * 0.5f), 
+			wrongMove
+		);
+		
+		if(wrongMove)
+			return;
 		
 		//we can finally switch the blocks
 		SwapBlocksInGrid(srcBlock, dstBlock);
 		
 		srcBlock.SetFixed(true);
-		dstBlock.SetFixed(true);
+		//dstBlock.SetFixed(true);
 	}
 //------------------------------------------------------------------------
 }
