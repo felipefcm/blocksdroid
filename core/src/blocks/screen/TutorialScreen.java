@@ -1,6 +1,7 @@
 
 package blocks.screen;
 
+import blocks.resource.Point;
 import blocks.resource.ResourceManager;
 import blocks.screen.ScreenManager.ScreenType;
 
@@ -17,16 +18,18 @@ public class TutorialScreen extends GameScreen
 	private Sprite m_TutorialSprite;
 	
 	private SpriteBatch m_Batch;
+	private Point<Integer> m_ViewSize;
 	
 	@Override
 	public void show()
 	{
 		m_Batch = ResourceManager.m_sInstance.m_SpriteBatch;
+		m_ViewSize = ResourceManager.m_sInstance.m_ViewSize;
 		
 		m_TutorialTexture = new Texture(Gdx.files.internal("gfx/tutorial.png"));
 		m_TutorialSprite = new Sprite(m_TutorialTexture);
 		
-		m_TutorialSprite.setBounds(0, 0, m_TutorialTexture.getWidth(), m_TutorialTexture.getHeight());
+		m_TutorialSprite.setBounds(0, 0, m_ViewSize.x, m_ViewSize.y);
 		
 		Gdx.input.setInputProcessor
 		(

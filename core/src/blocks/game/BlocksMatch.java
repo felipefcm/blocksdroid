@@ -46,23 +46,33 @@ public class BlocksMatch
 		m_BlockGrid.Render();
 	}
 	
+	public void OnMatchEnded()
+	{
+		
+	}
+	
+	public void RestartMatch()
+	{
+		
+	}
+	
 	public void IncrementScore(int inc)
 	{
 		m_Score += inc;
 		
-		if(m_Score < 30)
-			m_GameSpeed = 0.8f;
+		if(m_Score < 20)
+			m_GameSpeed = 0.7f;
 		else
-			if(m_Score < 60)
+			if(m_Score < 40)
 				m_GameSpeed = 0.6f;
 			else
-				if(m_Score < 90)
+				if(m_Score < 60)
 					m_GameSpeed = 0.4f;
 				else
-					if(m_Score < 120)
+					if(m_Score < 80)
 						m_GameSpeed = 0.3f;
 					else
-						if(m_Score < 150)
+						if(m_Score < 100)
 							m_GameSpeed = 0.2f;
 						else
 							m_GameSpeed = 0.1f;
