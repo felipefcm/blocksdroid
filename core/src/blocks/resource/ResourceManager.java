@@ -8,6 +8,7 @@ import blocks.game.Block;
 import blocks.game.Blocksdroid;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -18,6 +19,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -55,6 +60,8 @@ public class ResourceManager
 	public Texture m_MainSkinTexture;
 	public TextureRegion m_ButtonUpRegion;
 	public TextureRegion m_ButtonDownRegion;
+	public TextureRegion m_RetryButtonRegion;
+	public TextureRegion m_CancelButtonRegion;
 //--------------------------------------------------------------------
 	
 //Fonts --------------------------------------------------------------
@@ -62,6 +69,14 @@ public class ResourceManager
 	public BitmapFontCache m_BlocksdroidText;
 	public BitmapFont m_AckFont;
 	public BitmapFontCache m_ScoreText;
+//--------------------------------------------------------------------
+	
+//Skin styles --------------------------------------------------------
+	public TextButtonStyle m_TextButtonStyle;
+	public ButtonStyle m_RetryButtonStyle;
+	public ButtonStyle m_CancelButtonStyle;
+	public LabelStyle m_TitleLabelStyle;
+	public LabelStyle m_AckLabelStyle;
 //--------------------------------------------------------------------
 	
 	public boolean Init(final Blocksdroid game)
@@ -102,7 +117,7 @@ public class ResourceManager
 		m_BloxFont.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		m_AckFont = new BitmapFont(Gdx.files.internal("fonts/ack.fnt"));
-		m_AckFont.setScale(m_ViewSize.x * 0.0009f);
+		m_AckFont.setScale(m_ViewSize.x * 0.001f);
 		
 		TextBounds bounds = m_BloxFont.getBounds("BLOCKSDROID");
 
@@ -134,6 +149,44 @@ public class ResourceManager
 		
 		m_ButtonUpRegion = new TextureRegion(m_MainSkinTexture, 0, 0, 128, 32);
 		m_ButtonDownRegion = new TextureRegion(m_MainSkinTexture, 0, 32, 128, 32);
+		m_RetryButtonRegion = new TextureRegion(m_MainSkinTexture, 0, 64, 32, 32);
+		m_CancelButtonRegion = new TextureRegion(m_MainSkinTexture, 32, 64, 32, 32);
+	//----------------------------------------------------------------
+		
+	//skin -----------------------------------------------------------
+		m_TextButtonStyle = new TextButtonStyle
+		(
+			new TextureRegionDrawable(m_ButtonUpRegion),
+			new TextureRegionDrawable(m_ButtonDownRegion),
+			new TextureRegionDrawable(m_ButtonUpRegion),
+			m_AckFont
+		);
+		
+		m_RetryButtonStyle = new ButtonStyle
+		(
+			new TextureRegionDrawable(m_RetryButtonRegion),
+			new TextureRegionDrawable(m_RetryButtonRegion),
+			new TextureRegionDrawable(m_RetryButtonRegion)
+		);
+		
+		m_CancelButtonStyle = new ButtonStyle
+		(
+			new TextureRegionDrawable(m_CancelButtonRegion),
+			new TextureRegionDrawable(m_CancelButtonRegion),
+			new TextureRegionDrawable(m_CancelButtonRegion)
+		);
+				
+		m_TitleLabelStyle = new LabelStyle
+		(
+			m_BloxFont, 
+			new Color(Color.rgba8888(0.93f, 0.95f, 0.95f, 1.0f))
+		);
+		
+		m_AckLabelStyle = new LabelStyle
+		(
+			m_AckFont, 
+			new Color(Color.rgba8888(0.93f, 0.95f, 0.95f, 1.0f))
+		);
 	//----------------------------------------------------------------
 		
 		return true;
@@ -143,6 +196,7 @@ public class ResourceManager
 	{
 		m_MainSkinTexture.dispose();
 		m_BlockTexture.dispose();
+		m_AckFont.dispose();
 		m_BloxFont.dispose();
 	}
 	

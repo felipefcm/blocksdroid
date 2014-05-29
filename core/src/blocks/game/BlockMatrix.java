@@ -47,6 +47,13 @@ public class BlockMatrix
 		m_Blocks[pos.y][pos.x] = null;
 	}
 	
+	public void ClearAll()
+	{
+		for(int i = 0; i < m_Blocks.length; ++i)
+			for(int j = 0; j < m_Blocks[i].length; ++j)
+				m_Blocks[i][j] = null;
+	}
+	
 	public void DisposeBlock(Point<Integer> pos)
 	{
 		Block block = m_Blocks[pos.y][pos.x];

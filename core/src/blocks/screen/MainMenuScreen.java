@@ -6,7 +6,6 @@ import blocks.resource.ResourceManager;
 import blocks.screen.ScreenManager.ScreenType;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -16,16 +15,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MainMenuScreen extends GameScreen
 {
 	public Stage m_Stage;
 	public Table m_Table;
-	
-	public TextButtonStyle m_TextButtonStyle;
-	public LabelStyle m_LabelStyle;
 	
 	public Label m_TitleLabel;
 	
@@ -57,25 +52,14 @@ public class MainMenuScreen extends GameScreen
 		
 		Gdx.input.setInputProcessor(m_Stage);
 		
-		m_TextButtonStyle = new TextButtonStyle
-		(
-			new TextureRegionDrawable(ResourceManager.m_sInstance.m_ButtonUpRegion),
-			new TextureRegionDrawable(ResourceManager.m_sInstance.m_ButtonDownRegion),
-			new TextureRegionDrawable(ResourceManager.m_sInstance.m_ButtonUpRegion),
-			ResourceManager.m_sInstance.m_AckFont
-		);
+		LabelStyle labelStyle = ResourceManager.m_sInstance.m_TitleLabelStyle;
+		TextButtonStyle textButtonStyle = ResourceManager.m_sInstance.m_TextButtonStyle;
 		
-		m_LabelStyle = new LabelStyle
-		(
-			ResourceManager.m_sInstance.m_BloxFont, 
-			new Color(Color.rgba8888(0.93f, 0.95f, 0.95f, 1.0f))
-		);
-		
-		m_TitleLabel = new Label("BLOCKSDROID", m_LabelStyle);
-		m_PlayButton = new TextButton("PLAY", m_TextButtonStyle);
-		m_TutorialButton = new TextButton("TUTORIAL", m_TextButtonStyle);
-		m_LeaderboardsButton = new TextButton("LEADERBOARDS", m_TextButtonStyle);
-		m_QuitButton = new TextButton("QUIT", m_TextButtonStyle);
+		m_TitleLabel = new Label("BLOCKSDROID", labelStyle);
+		m_PlayButton = new TextButton("PLAY", textButtonStyle);
+		m_TutorialButton = new TextButton("TUTORIAL", textButtonStyle);
+		m_LeaderboardsButton = new TextButton("LEADERBOARDS", textButtonStyle);
+		m_QuitButton = new TextButton("QUIT", textButtonStyle);
 		
 		m_PlayButton.addListener
 		(
@@ -180,6 +164,7 @@ public class MainMenuScreen extends GameScreen
 	public void dispose()
 	{	
 		m_Stage.dispose();
+		m_Table = null;
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 
-package blocks.game;
+package blocks.ui;
 
 import blocks.resource.ResourceManager;
 

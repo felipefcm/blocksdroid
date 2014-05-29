@@ -6,6 +6,7 @@ import blocks.resource.BlockFactory;
 import blocks.resource.Log;
 import blocks.resource.Point;
 import blocks.resource.ResourceManager;
+import blocks.ui.SwapLine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -24,6 +25,7 @@ public class BlockGrid extends InputAdapter
 	private BlockMatrix m_Matrix;
 	
 	private BlocksMatch m_Match;
+	private boolean m_MatchEnded;
 	
 	private Matrix4 m_FromGridToWorld;
 	private Matrix4 m_FromWorldToGrid;
@@ -78,6 +80,10 @@ public class BlockGrid extends InputAdapter
 		m_SpriteBatch = ResourceManager.m_sInstance.m_SpriteBatch;
 		m_ShapeRenderer = ResourceManager.m_sInstance.m_ShapeRenderer;
 		m_ViewSize = ResourceManager.m_sInstance.m_ViewSize;
+		
+		m_MatchEnded = false;
+		
+		m_Matrix.ClearAll();
 		
 		m_FromGridToWorld.trn(m_ViewSize.x * 0.125f, m_ViewSize.y * 0.022f, 0);
 		m_FromWorldToGrid = m_FromGridToWorld.cpy().inv();
@@ -431,10 +437,8 @@ public class BlockGrid extends InputAdapter
 //Events -----------------------------------------------------------------
 	public void UpdateGame() 
 	{	
-		if(m_FallingPiece == null)
-		{
+		if(m_MatchEnded)
 			return;
-		}
 		
 		ProcessScoringConditions();
 		
@@ -451,6 +455,13 @@ public class BlockGrid extends InputAdapter
 			ProcessScoringConditions();
 			
 			CreateNewFallingPiece();
+			
+			if(m_FallingPiece == null)
+			{
+				//match ended
+				m_MatchEnded = true;
+				m_Match.OnMatchEnded();
+			}
 		}
 		else
 		{
