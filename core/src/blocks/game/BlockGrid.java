@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
@@ -33,6 +34,8 @@ public class BlockGrid extends InputAdapter
 	private SpriteBatch m_SpriteBatch;
 	private ShapeRenderer m_ShapeRenderer;
 	private Point<Integer> m_ViewSize;
+	
+	private Rectangle m_GridArea;
 	
 	private Block m_FallingPiece;
 	
@@ -63,12 +66,6 @@ public class BlockGrid extends InputAdapter
 		
 		m_Matrix = new BlockMatrix(numRows, numCols);
 		
-		m_FromGridToWorld = new Matrix4();
-		
-		m_EmptyPositions = m_NumRows * m_NumCols;
-
-		m_UpdateTime = 0;
-		
 		m_SwapLine = new SwapLine();
 		
 		m_TouchMoveStartedPoint = new Point<Integer>();
@@ -85,8 +82,22 @@ public class BlockGrid extends InputAdapter
 		
 		m_Matrix.ClearAll();
 		
+		m_EmptyPositions = m_NumRows * m_NumCols;
+		
+		m_UpdateTime = 0;
+		
+		m_FromGridToWorld = new Matrix4();
+		
 		m_FromGridToWorld.trn(m_ViewSize.x * 0.125f, m_ViewSize.y * 0.022f, 0);
 		m_FromWorldToGrid = m_FromGridToWorld.cpy().inv();
+		
+		m_GridArea = new Rectangle
+		(
+			m_ViewSize.x * 0.125f, 
+			m_ViewSize.y * 0.022f, 
+			m_NumCols * Block.m_sBlockViewSize, 
+			m_NumRows * Block.m_sBlockViewSize
+		);
 		
 		Gdx.input.setInputProcessor(this);
 		
@@ -127,7 +138,7 @@ public class BlockGrid extends InputAdapter
 	
 	public void Dispose()
 	{
-		m_SpriteBatch.dispose();
+		m_Matrix.ClearAll();
 	}
 	
 //Grid management --------------------------------------------------------
@@ -207,7 +218,7 @@ public class BlockGrid extends InputAdapter
 		{
 			for(int j = 0; j < m_NumCols; ++j)
 			{
-				Block block = BlockFactory.GetRandomBlock(BlockFactory.ENHANCED_BLOCKS);
+				Block block = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
 				
 				block.SetGridPos(j, i);
 				
@@ -216,7 +227,7 @@ public class BlockGrid extends InputAdapter
 		}
 	}
 	
-	private Vector3 FromGridToWorld(Point<Integer> gridPosition)
+	private Vector3 FromGridToWorld(final Point<Integer> gridPosition)
 	{
 		Vector3 blockPosInGridCoords = new Vector3
 				(
@@ -228,7 +239,7 @@ public class BlockGrid extends InputAdapter
 		return blockPosInGridCoords.cpy().mul(m_FromGridToWorld);
 	}
 	
-	private Point<Integer> FromWorldToGrid(Vector3 worldPosition)
+	private Point<Integer> FromWorldToGrid(final Vector3 worldPosition)
 	{
 		Vector3 blockPosInGridCoords = worldPosition.cpy().mul(m_FromWorldToGrid);
 		
@@ -282,10 +293,7 @@ public class BlockGrid extends InputAdapter
 		}
 		while(!IsGridPositionAvailable(newPos));
 		
-		if(m_Match.GetScore() < 50)
-			m_FallingPiece = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
-		else
-			m_FallingPiece = BlockFactory.GetRandomBlock(BlockFactory.ENHANCED_BLOCKS);
+		m_FallingPiece = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
 		
 		m_FallingPiece.SetGridPos(newPos);
 		
@@ -491,12 +499,24 @@ public class BlockGrid extends InputAdapter
 	}
 		
 	private void OnTouchMoveFinished()
-	{
+	{		
 		Vector3 srcWorldPos = ResourceManager.m_sInstance.m_Viewport.unproject(new Vector3(m_TouchMoveStartedPoint.x, m_TouchMoveStartedPoint.y, 0));
 		Vector3 dstWorldPos = ResourceManager.m_sInstance.m_Viewport.unproject(new Vector3(m_TouchMoveFinishedPoint.x, m_TouchMoveFinishedPoint.y, 0));
+	
+		if(!m_GridArea.contains(new Vector2(srcWorldPos.x, srcWorldPos.y)))
+		{
+			Log.Write("Ignoring move because src point not in the grid");
+			return;
+		}
+		
+		if(!m_GridArea.contains(new Vector2(dstWorldPos.x, dstWorldPos.y)))
+		{
+			Log.Write("Ignoring move because dst point not in the grid");
+			return;
+		}
 		
 		Point<Integer> srcGridPos = FromWorldToGrid(srcWorldPos);
-		Point<Integer> dstGridPos = FromWorldToGrid(dstWorldPos);
+		//Point<Integer> dstGridPos = FromWorldToGrid(dstWorldPos);
 		
 		float deltaX = dstWorldPos.x - srcWorldPos.x;
 		float deltaY = dstWorldPos.y - srcWorldPos.y;
@@ -585,7 +605,7 @@ public class BlockGrid extends InputAdapter
 		}
 		
 		Vector3 srcCornerWorld = FromGridToWorld(srcGridPos);
-		Vector3 dstCornerWorld = FromGridToWorld(dstGridPos);
+		Vector3 dstCornerWorld = FromGridToWorld(dstBlock.GetGridPos());
 		
 		m_SwapLine.CreateLine
 		(
@@ -601,7 +621,6 @@ public class BlockGrid extends InputAdapter
 		SwapBlocksInGrid(srcBlock, dstBlock);
 		
 		srcBlock.SetFixed(true);
-		//dstBlock.SetFixed(true);
 	}
 //------------------------------------------------------------------------
 }

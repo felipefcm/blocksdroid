@@ -8,8 +8,8 @@ import com.badlogic.gdx.utils.Array;
 
 public class BlockFactory 
 {
-	public static final int INITIAL_BLOCKS = 3;
-	public static final int ENHANCED_BLOCKS = 4;
+	public static final int INITIAL_BLOCKS = 4;
+	//public static final int ENHANCED_BLOCKS = 4;
 	
 	private static final int MAX_POOL_SIZE = 12;
 	private static Array<Block> m_sBlockPool = new Array<Block>(false, MAX_POOL_SIZE);

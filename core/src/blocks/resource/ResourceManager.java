@@ -8,6 +8,7 @@ import blocks.game.Block;
 import blocks.game.Blocksdroid;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -44,6 +45,8 @@ public class ResourceManager
 	public SpriteBatch m_SpriteBatch;
 	
 	public final Matrix4 m_IdentityMatrix = new Matrix4();
+	
+	public Preferences m_Preferences;
 //--------------------------------------------------------------------
 	
 //Textures -----------------------------------------------------------
@@ -103,6 +106,8 @@ public class ResourceManager
 		m_ShapeRenderer = new ShapeRenderer();
 		m_ShapeRenderer.setProjectionMatrix(m_Camera.combined);
 		
+		m_Preferences = Gdx.app.getPreferences("Blocksdroid_Prefs");
+		
 		if(!InitCommonResources())
 			return false;
 		
@@ -117,7 +122,7 @@ public class ResourceManager
 		m_BloxFont.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		m_AckFont = new BitmapFont(Gdx.files.internal("fonts/ack.fnt"));
-		m_AckFont.setScale(m_ViewSize.x * 0.001f);
+		m_AckFont.setScale(m_ViewSize.x * 0.0011f);
 		
 		TextBounds bounds = m_BloxFont.getBounds("BLOCKSDROID");
 
