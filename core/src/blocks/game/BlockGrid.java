@@ -308,6 +308,18 @@ public class BlockGrid extends InputAdapter
 //------------------------------------------------------------------------
 	
 //Piece elimination ------------------------------------------------------
+	private class EliminationData
+	{
+		public EliminationData(int pos, int count)
+		{
+			this.pos = pos;
+			this.count = count;
+		}
+		
+		public int pos;
+		public int count;
+	}
+	
 	private void ProcessScoringConditions()
 	{
 		boolean destructionFinished = false;
@@ -319,11 +331,11 @@ public class BlockGrid extends InputAdapter
 			
 			for(int col = 0; col < m_NumCols; ++col)
 			{
-				int colEliminationPos = CheckColumnElimination(col);
+				EliminationData colElimination = CheckColumnElimination(col);
 				
-				if(colEliminationPos != -1)
+				if(colElimination != null)
 				{
-					DestroyColumnGroup(colEliminationPos, col);
+					DestroyColumnGroup(colElimination.pos, col, colElimination.count);
 					m_Match.IncrementScore(1);
 					MoveDownPlacedBlocks(); //TODO check if can move down only that column
 					
@@ -334,11 +346,11 @@ public class BlockGrid extends InputAdapter
 			
 			for(int row = 0; row < m_NumRows; ++row)
 			{
-				int rowEliminationPos = CheckRowElimination(row);
+				EliminationData rowElimination = CheckRowElimination(row);
 				
-				if(rowEliminationPos != -1)
+				if(rowElimination != null)
 				{
-					DestroyRowGroup(rowEliminationPos, row);
+					DestroyRowGroup(rowElimination.pos, row, rowElimination.count);
 					m_Match.IncrementScore(1);
 					MoveDownPlacedBlocks(); //TODO check if can move down only three columns
 					
@@ -351,7 +363,7 @@ public class BlockGrid extends InputAdapter
 		}
 	}
 
-	private int CheckColumnElimination(int col)
+	private EliminationData CheckColumnElimination(int col)
 	{
 		BlockType currentType = null;
 		int currentTypeCount = 0;
@@ -359,36 +371,37 @@ public class BlockGrid extends InputAdapter
 		for(int i = 0; i < m_NumRows; ++i)
 		{
 			Block block = m_Matrix.GetAt(i, col); 
-			
-			if(block == null || block == m_FallingPiece)
-			{
-				return -1;
-			}
-			
-			if(currentType == null)
-				currentType = block.GetType();
-			
-			if(currentType == block.GetType())
+						
+			if(block != null && block != m_FallingPiece && currentType == block.GetType())
 			{
 				++currentTypeCount;
 			}
 			else
 			{
+				if(currentTypeCount >= 3)
+				{
+					//return the last block (the top most one)
+					return new EliminationData(i - 1, currentTypeCount);
+				}
+				
+				if(block == null || block == m_FallingPiece)
+					return null;
+				
 				currentType = block.GetType();
 				currentTypeCount = 1;
 			}
-			
-			if(currentTypeCount == 3)
-			{
-				//return the last block (the top most one)
-				return i;
-			}
 		}
 		
-		return -1;
+		if(currentTypeCount >= 3)
+		{
+			//return the last block (the top most one)
+			return new EliminationData(m_NumRows - 1, currentTypeCount);
+		}
+		
+		return null;
 	}
 	
-	private int CheckRowElimination(int row)
+	private EliminationData CheckRowElimination(int row)
 	{
 		BlockType currentType = null;
 		int currentTypeCount = 0;
@@ -397,48 +410,46 @@ public class BlockGrid extends InputAdapter
 		{
 			Block block = m_Matrix.GetAt(row, i); 
 			
-			if(block == null || block == m_FallingPiece)
-			{
-				currentType = null;
-				currentTypeCount = 0;
-				continue;
-			}
-			
-			if(currentType == null)
-				currentType = block.GetType();
-			
-			if(currentType == block.GetType())
+			if(block != null && block != m_FallingPiece && currentType == block.GetType())
 			{
 				++currentTypeCount;
 			}
 			else
 			{
-				currentType = block.GetType();
+				if(currentTypeCount >= 3)
+				{
+					//return the last block (the right most one)
+					return new EliminationData(i - 1, currentTypeCount);
+				}
+				
+				if(block == null || block == m_FallingPiece)
+					currentType = null;
+				else
+					currentType = block.GetType();
+				
 				currentTypeCount = 1;
-			}
-			
-			if(currentTypeCount == 3)
-			{
-				//return the last block (the right most one)
-				return i;
 			}
 		}
 		
-		return -1;
+		if(currentTypeCount >= 3)
+		{
+			//return the last block (the right most one)
+			return new EliminationData(m_NumCols - 1, currentTypeCount);
+		}
+		
+		return null;
 	}
 	
-	private void DestroyColumnGroup(int topMost, int col)
+	private void DestroyColumnGroup(int topMost, int col, int count)
 	{
-		RemoveBlockFromGrid(new Point(col, topMost));
-		RemoveBlockFromGrid(new Point(col, topMost - 1));
-		RemoveBlockFromGrid(new Point(col, topMost - 2));
+		for(int i = 0; i < count; ++i)
+			RemoveBlockFromGrid(new Point<Integer>(col, topMost - i));
 	}
 	
-	private void DestroyRowGroup(int rightMost, int row)
+	private void DestroyRowGroup(int rightMost, int row, int count)
 	{		
-		RemoveBlockFromGrid(new Point(rightMost, row));
-		RemoveBlockFromGrid(new Point(rightMost - 1, row));
-		RemoveBlockFromGrid(new Point(rightMost - 2, row));
+		for(int i = 0; i < count; ++i)
+			RemoveBlockFromGrid(new Point<Integer>(rightMost - i, row));
 	}
 //------------------------------------------------------------------------
 	

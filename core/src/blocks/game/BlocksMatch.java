@@ -13,7 +13,7 @@ public class BlocksMatch
 	public static final int NumRows = 6;
 	public static final int NumCols = 5;
 	
-	public static final float[] GameSpeeds = { 0.6f, 0.5f, 0.4f, 0.3f, 0.2f, 0.1f };
+	public static final float[] GameSpeeds = { 0.6f, 0.5f, 0.4f, 0.3f, 0.2f, 0.15f };
 
 	public float m_GameSpeed;
 
