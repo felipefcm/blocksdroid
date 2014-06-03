@@ -50,6 +50,7 @@ public class ResourceManager
 	public Preferences m_Preferences;
 	
 	public AdManager m_AdManager;
+	public SwarmResources m_SwarmResources;
 //--------------------------------------------------------------------
 	
 //Textures -----------------------------------------------------------

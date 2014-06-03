@@ -26,6 +26,7 @@ public class MainMenuScreen extends GameScreen
 	
 	public TextButton m_PlayButton;
 	public TextButton m_TutorialButton;
+	public TextButton m_LeaderboardsButton;
 	public TextButton m_QuitButton;
 	
 	private SpriteBatch m_Batch;
@@ -59,6 +60,7 @@ public class MainMenuScreen extends GameScreen
 		m_TitleLabel = new Label("BLOCKSDROID", labelStyle);
 		m_PlayButton = new TextButton("PLAY", textButtonStyle);
 		m_TutorialButton = new TextButton("TUTORIAL", textButtonStyle);
+		m_LeaderboardsButton = new TextButton("LEADERBOARDS", textButtonStyle);
 		m_QuitButton = new TextButton("QUIT", textButtonStyle);
 		
 		m_PlayButton.addListener
@@ -81,6 +83,18 @@ public class MainMenuScreen extends GameScreen
 				public void clicked(InputEvent event, float x, float y)
 				{
 					ScreenManager.m_sInstance.SetScreen(new TutorialScreen());
+				}
+			}
+		);
+		
+		m_LeaderboardsButton.addListener
+		(
+			new ClickListener()
+			{
+				@Override
+				public void clicked(InputEvent event, float x, float y)
+				{
+					ResourceManager.m_sInstance.m_SwarmResources.ShowLeaderboard();
 				}
 			}
 		);
@@ -108,6 +122,8 @@ public class MainMenuScreen extends GameScreen
 		m_Table.add(m_PlayButton).width(buttonsWidth).height(buttonsHeight).padTop(m_ViewSize.y * 0.08f).spaceBottom(buttonsSpacing);
 		m_Table.row();
 		m_Table.add(m_TutorialButton).width(buttonsWidth).height(buttonsHeight).spaceBottom(buttonsSpacing);
+		m_Table.row();
+		m_Table.add(m_LeaderboardsButton).width(buttonsWidth).height(buttonsHeight).spaceBottom(buttonsSpacing);
 		m_Table.row();
 		m_Table.add(m_QuitButton).width(buttonsWidth).height(buttonsHeight);
 	}

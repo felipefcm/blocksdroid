@@ -8,13 +8,16 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import blocks.ad.AdHandler;
 import blocks.ad.AndroidAdManager;
+import blocks.resource.AndroidSwarmResources;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.swarmconnect.Swarm;
 
 public class AndroidLauncher extends AndroidApplication 
 {
-	protected AdHandler m_AdHandler;
+	private AdHandler m_AdHandler;
+	private AndroidAdManager m_AdManager;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
@@ -33,12 +36,12 @@ public class AndroidLauncher extends AndroidApplication
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 		
-		AndroidAdManager adManager = new AndroidAdManager(this);
+		m_AdManager = new AndroidAdManager(this);
 		
-		m_AdHandler = new AdHandler(adManager.GetAdView(), adManager.GetTopBanner());
-		adManager.SetHandler(m_AdHandler);
+		m_AdHandler = new AdHandler(m_AdManager.GetAdView(), m_AdManager.GetTopBanner());
+		m_AdManager.SetHandler(m_AdHandler);
 		
-		View gameView = initializeForView(new Blocksdroid(adManager), config);
+		View gameView = initializeForView(new Blocksdroid(m_AdManager, new AndroidSwarmResources(this)), config);
 		
 		relativeLayout.addView(gameView);
 
@@ -51,8 +54,30 @@ public class AndroidLauncher extends AndroidApplication
 		adParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 		adParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		
-		relativeLayout.addView(adManager.GetAdView(), adParams);
+		relativeLayout.addView(m_AdManager.GetAdView(), adParams);
+		
+		Swarm.setActive(this);
 		
 		setContentView(relativeLayout);
+	}
+	
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		
+		m_AdManager.GetAdView().resume();
+		
+		Swarm.setActive(this);
+	}
+	
+	@Override
+	protected void onPause()
+	{
+		m_AdManager.GetAdView().pause();
+		
+		Swarm.setInactive(this);
+		
+		super.onPause();
 	}
 }

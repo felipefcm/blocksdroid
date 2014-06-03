@@ -4,6 +4,7 @@ package blocks.game;
 import blocks.ad.AdManager;
 import blocks.resource.Log;
 import blocks.resource.ResourceManager;
+import blocks.resource.SwarmResources;
 import blocks.screen.ScreenManager;
 
 import com.badlogic.gdx.Game;
@@ -16,9 +17,10 @@ public class Blocksdroid extends Game
 {
 	private ShapeRenderer m_ShapeRenderer;
 	
-	public Blocksdroid(AdManager adManager)
+	public Blocksdroid(AdManager adManager, SwarmResources swarmResources)
 	{
 		ResourceManager.m_sInstance.m_AdManager = adManager;
+		ResourceManager.m_sInstance.m_SwarmResources = swarmResources;
 	}
 	
 	@Override
