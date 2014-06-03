@@ -1,6 +1,7 @@
 
 package blocks.game;
 
+import blocks.ad.AdManager;
 import blocks.resource.Log;
 import blocks.resource.ResourceManager;
 import blocks.screen.ScreenManager;
@@ -15,8 +16,9 @@ public class Blocksdroid extends Game
 {
 	private ShapeRenderer m_ShapeRenderer;
 	
-	public Blocksdroid()
+	public Blocksdroid(AdManager adManager)
 	{
+		ResourceManager.m_sInstance.m_AdManager = adManager;
 	}
 	
 	@Override

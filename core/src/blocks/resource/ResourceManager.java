@@ -4,6 +4,7 @@ package blocks.resource;
 import java.util.Date;
 import java.util.Random;
 
+import blocks.ad.AdManager;
 import blocks.game.Block;
 import blocks.game.Blocksdroid;
 
@@ -47,6 +48,8 @@ public class ResourceManager
 	public final Matrix4 m_IdentityMatrix = new Matrix4();
 	
 	public Preferences m_Preferences;
+	
+	public AdManager m_AdManager;
 //--------------------------------------------------------------------
 	
 //Textures -----------------------------------------------------------
@@ -128,7 +131,7 @@ public class ResourceManager
 
 		m_BlocksdroidText = new BitmapFontCache(m_BloxFont);
 		m_BlocksdroidText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
-		m_BlocksdroidText.addText("BLOCKSDROID", (m_ViewSize.x - bounds.width) / 2.0f, m_ViewSize.y * 0.98f);
+		m_BlocksdroidText.addText("BLOCKSDROID", (m_ViewSize.x - bounds.width) / 2.0f, m_ViewSize.y * 0.88f);
 		
 		m_ScoreText = new BitmapFontCache(m_AckFont);
 		m_ScoreText.setColor(0.93f, 0.95f, 0.95f, 1.0f);

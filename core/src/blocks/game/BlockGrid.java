@@ -48,7 +48,7 @@ public class BlockGrid extends InputAdapter
 	private Point<Integer> m_TouchMoveStartedPoint;
 	private Point<Integer> m_TouchMoveFinishedPoint;
 	private final float m_MinTouchLength = Block.m_sBlockViewSize * 0.5f;
-	private final float m_MaxTouchLength = Block.m_sBlockViewSize * 3.0f;
+	private final float m_MaxTouchLength = Block.m_sBlockViewSize * 1.7f;
 	
 	public enum MoveDirection
 	{

@@ -42,6 +42,8 @@ public class MainMenuScreen extends GameScreen
 		m_Batch = ResourceManager.m_sInstance.m_SpriteBatch;
 		m_Viewport = ResourceManager.m_sInstance.m_Viewport;
 		m_ViewSize = ResourceManager.m_sInstance.m_ViewSize;
+		
+		ResourceManager.m_sInstance.m_AdManager.EnableAds();
 				
 		m_Table = new Table();
 		m_Table.setFillParent(true);
