@@ -34,6 +34,9 @@ public class BlockMatrix
 	
 	public Block GetAt(int row, int col)
 	{
+		if(row >= m_Blocks.length || col >= m_Blocks[0].length)
+			return null;
+		
 		return m_Blocks[row][col];
 	}
 	
