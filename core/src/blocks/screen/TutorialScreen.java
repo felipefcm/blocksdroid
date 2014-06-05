@@ -31,6 +31,8 @@ public class TutorialScreen extends GameScreen
 		
 		m_TutorialSprite.setBounds(0, 0, m_ViewSize.x, m_ViewSize.y);
 		
+		ResourceManager.m_sInstance.m_AdManager.DisableAds();
+		
 		Gdx.input.setInputProcessor
 		(
 			new InputAdapter()
@@ -77,6 +79,8 @@ public class TutorialScreen extends GameScreen
 	public void hide()
 	{
 		dispose();
+		
+		ResourceManager.m_sInstance.m_AdManager.EnableAds();
 	}
 
 	@Override

@@ -132,7 +132,7 @@ public class ResourceManager
 
 		m_BlocksdroidText = new BitmapFontCache(m_BloxFont);
 		m_BlocksdroidText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
-		m_BlocksdroidText.addText("BLOCKSDROID", (m_ViewSize.x - bounds.width) / 2.0f, m_ViewSize.y * 0.88f);
+		m_BlocksdroidText.addText("BLOCKSDROID", (m_ViewSize.x - bounds.width) / 2.0f, m_ViewSize.y * 0.9f);
 		
 		m_ScoreText = new BitmapFontCache(m_AckFont);
 		m_ScoreText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
@@ -155,6 +155,7 @@ public class ResourceManager
 		Block.m_sBlockViewSize = m_ViewSize.x * 0.15f;
 		
 		m_MainSkinTexture = new Texture(Gdx.files.internal("gfx/UI/main_skin.png"));
+		m_MainSkinTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		m_ButtonUpRegion = new TextureRegion(m_MainSkinTexture, 0, 0, 128, 32);
 		m_ButtonDownRegion = new TextureRegion(m_MainSkinTexture, 0, 32, 128, 32);

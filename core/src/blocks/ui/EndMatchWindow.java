@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -39,6 +40,7 @@ public class EndMatchWindow
 	private Label m_BestLabel;
 	private Button m_RetryButton;
 	private Button m_CancelButton;
+	private TextButton m_SubmitScoreButton;
 	
 	public EndMatchWindow()
 	{
@@ -52,7 +54,7 @@ public class EndMatchWindow
 		m_ShapeRenderer = ResourceManager.m_sInstance.m_ShapeRenderer;
 		
 		m_BgWidth = m_ViewSize.x * 0.7f;
-		m_BgHeight = m_ViewSize.y * 0.35f;
+		m_BgHeight = m_ViewSize.y * 0.4f;
 		
 		m_Table = new Table();
 		m_Table.setFillParent(true);
@@ -74,6 +76,8 @@ public class EndMatchWindow
 		
 		m_CancelButton = new Button(ResourceManager.m_sInstance.m_CancelButtonStyle);
 		
+		m_SubmitScoreButton = new TextButton("SUBMIT SCORE", ResourceManager.m_sInstance.m_TextButtonStyle);
+		
 		m_Table.add(m_GameOverLabel).width(m_BgWidth * 0.8f).padBottom(8.0f).colspan(2);
 		m_Table.row();
 		m_Table.add(m_ScoreLabel).colspan(2);
@@ -83,6 +87,9 @@ public class EndMatchWindow
 		
 		m_Table.add(m_RetryButton).width(m_BgWidth * 0.2f).height(m_BgWidth * 0.2f).padTop(m_BgHeight * 0.1f);
 		m_Table.add(m_CancelButton).width(m_BgWidth * 0.2f).height(m_BgWidth * 0.2f).padTop(m_BgHeight * 0.1f);
+		m_Table.row();
+		
+		m_Table.add(m_SubmitScoreButton).padTop(m_BgWidth * 0.07f).colspan(2);
 		
 		Gdx.input.setInputProcessor(m_Stage);
 		
@@ -106,6 +113,18 @@ public class EndMatchWindow
 				public void clicked(InputEvent event, float x, float y)
 				{
 					ScreenManager.m_sInstance.SetScreen(new MainMenuScreen());
+				}
+			}
+		);
+		
+		m_SubmitScoreButton.addListener
+		(
+			new ClickListener()
+			{
+				@Override
+				public void clicked(InputEvent event, float x, float y)
+				{
+					ResourceManager.m_sInstance.m_SwarmResources.SubmitAndShowLeaderboard(match.GetBestScore());
 				}
 			}
 		);

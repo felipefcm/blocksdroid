@@ -34,6 +34,8 @@ public class Blocksdroid extends Game
 		if(!ScreenManager.m_sInstance.Init())
 			Log.Write("Failed to init ScreenManager");
 		
+		ResourceManager.m_sInstance.m_SwarmResources.PreLoadSwarm();
+		
 		m_ShapeRenderer = ResourceManager.m_sInstance.m_ShapeRenderer;
 		
 		Gdx.gl.glClearColor(0, 0, 0, 0);

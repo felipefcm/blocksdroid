@@ -13,7 +13,12 @@ public class BlocksMatch
 	public static final int NumRows = 6;
 	public static final int NumCols = 5;
 	
-	public static final float[] GameSpeeds = { 0.6f, 0.5f, 0.4f, 0.3f, 0.2f, 0.15f };
+	public static final float[] GameSpeeds = 
+	{ 
+		0.60f, 0.50f, 0.40f, 0.30f, 
+		0.20f, 0.15f, 0.14f, 0.13f,
+		0.12f, 0.11f, 0.10f 
+	};
 
 	public float m_GameSpeed;
 
@@ -47,6 +52,9 @@ public class BlocksMatch
 		ReadBestScoreInPreferences();
 
 		m_BlockGrid.Init();
+		
+		//for debugging
+		//OnMatchEnded();
 	}
 	
 	public void Render()
@@ -89,22 +97,12 @@ public class BlocksMatch
 	{
 		m_Score += inc;
 		
-		if(m_Score < 20)
-			m_GameSpeed = GameSpeeds[0];
+		int speedIndex = (int)((float) m_Score / 20.0f);
+		
+		if(speedIndex < GameSpeeds.length)
+			m_GameSpeed = GameSpeeds[speedIndex];
 		else
-			if(m_Score < 40)
-				m_GameSpeed = GameSpeeds[1];
-			else
-				if(m_Score < 60)
-					m_GameSpeed = GameSpeeds[2];
-				else
-					if(m_Score < 80)
-						m_GameSpeed = GameSpeeds[3];
-					else
-						if(m_Score < 100)
-							m_GameSpeed = GameSpeeds[4];
-						else
-							m_GameSpeed = GameSpeeds[5];
+			m_GameSpeed = GameSpeeds[GameSpeeds.length - 1];
 	}
 	
 	public int GetScore()
