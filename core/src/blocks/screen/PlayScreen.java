@@ -11,6 +11,7 @@ public class PlayScreen extends GameScreen
 {	
 	private BlocksMatch m_Match;
 	private SpriteBatch m_SpriteBatch;
+	
 	public PlayScreen() 
 	{
 		m_Match = new BlocksMatch();
@@ -35,6 +36,11 @@ public class PlayScreen extends GameScreen
 		m_SpriteBatch.end();
 		
 		m_Match.Render();
+	}
+	
+	public BlocksMatch GetMatch()
+	{
+		return m_Match;
 	}
 
 	@Override

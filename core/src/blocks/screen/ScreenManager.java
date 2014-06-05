@@ -41,6 +41,18 @@ public class ScreenManager
 		m_Game.setScreen(screen);
 	}
 	
+	public void ActivityPaused()
+	{
+	}
+	
+	public void ActivityResumed()
+	{
+		if(m_CurrentScreen instanceof PlayScreen)
+		{
+			((PlayScreen) m_CurrentScreen).GetMatch().PauseMatch();
+		}
+	}
+	
 	public void Dispose()
 	{
 		if(m_CurrentScreen != null)

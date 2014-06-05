@@ -114,6 +114,9 @@ public class BlocksMatch
 	
 	public void PauseMatch()
 	{
+		if(m_ShowEndMatchWindow)
+			return;
+		
 		m_Paused = true;
 	}
 	

@@ -72,6 +72,20 @@ public class Blocksdroid extends Game
 		
 		super.resize(width, height);
 	}
+	
+	@Override
+	public void pause()
+	{
+		ScreenManager.m_sInstance.ActivityPaused();
+		super.pause();
+	}
+	
+	@Override
+	public void resume()
+	{
+		super.resume();
+		ScreenManager.m_sInstance.ActivityResumed();
+	}
 
 	@Override
 	public void dispose() 
