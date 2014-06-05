@@ -54,7 +54,7 @@ public class EndMatchWindow
 		m_ShapeRenderer = ResourceManager.m_sInstance.m_ShapeRenderer;
 		
 		m_BgWidth = m_ViewSize.x * 0.7f;
-		m_BgHeight = m_ViewSize.y * 0.4f;
+		m_BgHeight = m_ViewSize.y * 0.45f;
 		
 		m_Table = new Table();
 		m_Table.setFillParent(true);

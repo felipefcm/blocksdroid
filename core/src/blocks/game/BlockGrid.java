@@ -504,6 +504,12 @@ public class BlockGrid extends InputAdapter
 		m_TouchMoveFinishedPoint.x = screenX;
 		m_TouchMoveFinishedPoint.y = screenY;
 		
+		if(m_Match.IsPaused())
+		{
+			m_Match.UnpauseMatch();
+			return true;
+		}
+		
 		OnTouchMoveFinished();
 
 		return true;
@@ -514,6 +520,12 @@ public class BlockGrid extends InputAdapter
 		Vector3 srcWorldPos = ResourceManager.m_sInstance.m_Viewport.unproject(new Vector3(m_TouchMoveStartedPoint.x, m_TouchMoveStartedPoint.y, 0));
 		Vector3 dstWorldPos = ResourceManager.m_sInstance.m_Viewport.unproject(new Vector3(m_TouchMoveFinishedPoint.x, m_TouchMoveFinishedPoint.y, 0));
 	
+		if(m_Match.m_PauseButton.getBoundingRectangle().contains(dstWorldPos.x, dstWorldPos.y))
+		{
+			m_Match.PauseMatch();
+			return;
+		}
+		
 		if(!m_GridArea.contains(new Vector2(srcWorldPos.x, srcWorldPos.y)))
 		{
 			Log.Write("Ignoring move because src point not in the grid");

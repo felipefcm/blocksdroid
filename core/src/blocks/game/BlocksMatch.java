@@ -6,7 +6,12 @@ import blocks.resource.PreferencesSecurity;
 import blocks.resource.ResourceManager;
 import blocks.ui.EndMatchWindow;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
 public class BlocksMatch
 {
@@ -24,6 +29,7 @@ public class BlocksMatch
 
 	private BlockGrid m_BlockGrid;
 	private SpriteBatch m_SpriteBatch;
+	private ShapeRenderer m_ShapeRenderer;
 	private Point<Integer> m_ViewSize;
 	private EndMatchWindow m_EndMatchWindow;
 	
@@ -31,6 +37,9 @@ public class BlocksMatch
 	private int m_BestScore;
 	
 	private boolean m_ShowEndMatchWindow;
+	
+	public Sprite m_PauseButton;
+	private boolean m_Paused;
 	
 	public BlocksMatch()
 	{
@@ -41,9 +50,17 @@ public class BlocksMatch
 	public void Init()
 	{	
 		m_SpriteBatch = ResourceManager.m_sInstance.m_SpriteBatch;
+		m_ShapeRenderer = ResourceManager.m_sInstance.m_ShapeRenderer;
 		m_ViewSize = ResourceManager.m_sInstance.m_ViewSize;
 		
+		if(m_PauseButton == null)
+		{
+			m_PauseButton = new Sprite(ResourceManager.m_sInstance.m_PauseButtonRegion);
+			m_PauseButton.setBounds(m_ViewSize.x * 0.8f, m_ViewSize.y * 0.71f, m_ViewSize.x * 0.08f, m_ViewSize.x * 0.08f);
+		}
+		
 		m_ShowEndMatchWindow = false;
+		m_Paused = false;
 		
 		m_GameSpeed = GameSpeeds[0];
 		
@@ -63,15 +80,51 @@ public class BlocksMatch
 		{
 			ResourceManager.m_sInstance.m_ScoreText.draw(m_SpriteBatch);
 			ResourceManager.m_sInstance.m_AckFont.draw(m_SpriteBatch, "" + m_Score, m_ViewSize.x * 0.45f, m_ViewSize.y * 0.74f);
+			
+			m_PauseButton.draw(m_SpriteBatch);
 		}
 		m_SpriteBatch.end();
 		
-		m_BlockGrid.Render();
+		if(m_Paused)
+		{
+			Gdx.gl.glEnable(GL20.GL_BLEND);
+			m_ShapeRenderer.begin(ShapeType.Filled);
+			{
+				m_ShapeRenderer.setColor(0, 0, 0, 0.9f);
+				m_ShapeRenderer.rect(0, 0, m_ViewSize.x, m_ViewSize.y);
+			}
+			m_ShapeRenderer.end();
+			Gdx.gl.glDisable(GL20.GL_BLEND);
+			
+			m_SpriteBatch.begin();
+			{
+				ResourceManager.m_sInstance.m_PausedText.draw(m_SpriteBatch);
+				ResourceManager.m_sInstance.m_TouchToQuitText.draw(m_SpriteBatch);
+			}
+			m_SpriteBatch.end();
+		}
+		else		
+			m_BlockGrid.Render();
 		
 		if(m_ShowEndMatchWindow)
 		{
 			m_EndMatchWindow.Render();
 		}
+	}
+	
+	public void PauseMatch()
+	{
+		m_Paused = true;
+	}
+	
+	public void UnpauseMatch()
+	{
+		m_Paused = false;
+	}
+	
+	public boolean IsPaused()
+	{
+		return m_Paused;
 	}
 	
 	public void OnMatchEnded()

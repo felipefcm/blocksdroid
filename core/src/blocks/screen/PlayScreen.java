@@ -11,7 +11,6 @@ public class PlayScreen extends GameScreen
 {	
 	private BlocksMatch m_Match;
 	private SpriteBatch m_SpriteBatch;
-	
 	public PlayScreen() 
 	{
 		m_Match = new BlocksMatch();

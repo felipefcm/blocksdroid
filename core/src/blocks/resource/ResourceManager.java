@@ -69,6 +69,7 @@ public class ResourceManager
 	public TextureRegion m_ButtonDownRegion;
 	public TextureRegion m_RetryButtonRegion;
 	public TextureRegion m_CancelButtonRegion;
+	public TextureRegion m_PauseButtonRegion;
 //--------------------------------------------------------------------
 	
 //Fonts --------------------------------------------------------------
@@ -76,6 +77,8 @@ public class ResourceManager
 	public BitmapFontCache m_BlocksdroidText;
 	public BitmapFont m_AckFont;
 	public BitmapFontCache m_ScoreText;
+	public BitmapFontCache m_PausedText;
+	public BitmapFontCache m_TouchToQuitText;
 //--------------------------------------------------------------------
 	
 //Skin styles --------------------------------------------------------
@@ -137,6 +140,18 @@ public class ResourceManager
 		m_ScoreText = new BitmapFontCache(m_AckFont);
 		m_ScoreText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
 		m_ScoreText.addText("SCORE:",  m_ViewSize.x * 0.125f, m_ViewSize.y * 0.74f);
+		
+		bounds = m_AckFont.getBounds("PAUSED");
+		
+		m_PausedText = new BitmapFontCache(m_AckFont);
+		m_PausedText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
+		m_PausedText.addText("PAUSED", (m_ViewSize.x - bounds.width) / 2.0f, (m_ViewSize.y - bounds.height) / 2.0f + m_ViewSize.y * 0.03f);
+		
+		bounds = m_AckFont.getBounds("TOUCH TO RESUME");
+		
+		m_TouchToQuitText = new BitmapFontCache(m_AckFont);
+		m_TouchToQuitText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
+		m_TouchToQuitText.addText("TOUCH TO RESUME", (m_ViewSize.x - bounds.width) / 2.0f, (m_ViewSize.y - bounds.height) / 2.0f - m_ViewSize.y * 0.03f);		
 	//----------------------------------------------------------------
 		
 	//textures -------------------------------------------------------
@@ -161,6 +176,7 @@ public class ResourceManager
 		m_ButtonDownRegion = new TextureRegion(m_MainSkinTexture, 0, 32, 128, 32);
 		m_RetryButtonRegion = new TextureRegion(m_MainSkinTexture, 0, 64, 32, 32);
 		m_CancelButtonRegion = new TextureRegion(m_MainSkinTexture, 32, 64, 32, 32);
+		m_PauseButtonRegion = new TextureRegion(m_MainSkinTexture, 64, 64, 32, 32);
 	//----------------------------------------------------------------
 		
 	//skin -----------------------------------------------------------
