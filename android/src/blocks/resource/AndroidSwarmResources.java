@@ -64,7 +64,7 @@ public class AndroidSwarmResources implements SwarmResources
 	@Override
 	public void SubmitScore(int score)
 	{
-		if(!Swarm.isInitialized())
+		if(!Swarm.isEnabled())
 			InitSwarm();
 
 		SwarmLeaderboard.submitScore(m_LeaderboardId, (float) score);
@@ -73,7 +73,7 @@ public class AndroidSwarmResources implements SwarmResources
 	@Override
 	public void ShowLeaderboard()
 	{
-		if(!Swarm.isInitialized())
+		if(!Swarm.isEnabled())
 			InitSwarm();
 		
 		SwarmLeaderboard.showLeaderboard(m_LeaderboardId);
@@ -82,7 +82,7 @@ public class AndroidSwarmResources implements SwarmResources
 	@Override
 	public void SubmitAndShowLeaderboard(int score)
 	{
-		if(!Swarm.isInitialized())
+		if(!Swarm.isEnabled())
 			InitSwarm();
 		
 		SwarmLeaderboard.submitScoreAndShowLeaderboard(m_LeaderboardId, (float) score);
