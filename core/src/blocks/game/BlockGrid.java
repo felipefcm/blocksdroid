@@ -48,7 +48,7 @@ public class BlockGrid extends InputAdapter
 	private Point<Integer> m_TouchMoveStartedPoint;
 	private Point<Integer> m_TouchMoveFinishedPoint;
 	private final float m_MinTouchLength = Block.m_sBlockViewSize * 0.5f;
-	private final float m_MaxTouchLength = Block.m_sBlockViewSize * 1.7f;
+	private final float m_MaxTouchLength = Block.m_sBlockViewSize * 2.8f;
 	
 	public enum MoveDirection
 	{
@@ -84,6 +84,8 @@ public class BlockGrid extends InputAdapter
 		
 		m_EmptyPositions = m_NumRows * m_NumCols;
 		
+		PrePopulateGrid();
+		
 		m_UpdateTime = 0;
 		
 		m_FromGridToWorld = new Matrix4();
@@ -102,6 +104,11 @@ public class BlockGrid extends InputAdapter
 		Gdx.input.setInputProcessor(this);
 		
 		CreateNewFallingPiece();
+	}
+	
+	private void PrePopulateGrid()
+	{
+		
 	}
 	
 	public void Render()
@@ -520,6 +527,7 @@ public class BlockGrid extends InputAdapter
 		Vector3 srcWorldPos = ResourceManager.m_sInstance.m_Viewport.unproject(new Vector3(m_TouchMoveStartedPoint.x, m_TouchMoveStartedPoint.y, 0));
 		Vector3 dstWorldPos = ResourceManager.m_sInstance.m_Viewport.unproject(new Vector3(m_TouchMoveFinishedPoint.x, m_TouchMoveFinishedPoint.y, 0));
 	
+		//FIX
 		if(m_Match.m_PauseButton.getBoundingRectangle().contains(dstWorldPos.x, dstWorldPos.y))
 		{
 			m_Match.PauseMatch();
@@ -534,8 +542,17 @@ public class BlockGrid extends InputAdapter
 		
 		if(!m_GridArea.contains(new Vector2(dstWorldPos.x, dstWorldPos.y)))
 		{
-			Log.Write("Ignoring move because dst point not in the grid");
-			return;
+			if(dstWorldPos.x < m_GridArea.x)
+				dstWorldPos.x = m_GridArea.x;
+			else
+				if(dstWorldPos.x > m_GridArea.x + m_GridArea.width)
+					dstWorldPos.x = m_GridArea.x + m_GridArea.width;
+			
+			if(dstWorldPos.y < m_GridArea.y)
+				dstWorldPos.y = m_GridArea.y;
+			else
+				if(dstWorldPos.y > m_GridArea.y + m_GridArea.height)
+					dstWorldPos.y = m_GridArea.y + m_GridArea.height;
 		}
 		
 		Point<Integer> srcGridPos = FromWorldToGrid(srcWorldPos);

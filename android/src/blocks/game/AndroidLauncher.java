@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import blocks.ad.AdHandler;
 import blocks.ad.AndroidAdManager;
 import blocks.resource.AndroidSwarmResources;
+import blocks.resource.Log;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
@@ -56,8 +57,6 @@ public class AndroidLauncher extends AndroidApplication
 		
 		relativeLayout.addView(m_AdManager.GetAdView(), adParams);
 		
-		Swarm.setActive(this);
-		
 		setContentView(relativeLayout);
 	}
 	
@@ -68,6 +67,7 @@ public class AndroidLauncher extends AndroidApplication
 		
 		m_AdManager.GetAdView().resume();
 		
+		Log.Write("Swarm set active");
 		Swarm.setActive(this);
 	}
 	
@@ -76,6 +76,7 @@ public class AndroidLauncher extends AndroidApplication
 	{
 		m_AdManager.GetAdView().pause();
 		
+		Log.Write("Swarm set inactive");
 		Swarm.setInactive(this);
 		
 		super.onPause();

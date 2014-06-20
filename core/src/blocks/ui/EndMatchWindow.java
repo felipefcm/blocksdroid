@@ -124,7 +124,7 @@ public class EndMatchWindow
 				@Override
 				public void clicked(InputEvent event, float x, float y)
 				{
-					ResourceManager.m_sInstance.m_SwarmResources.SubmitAndShowLeaderboard(match.GetBestScore());
+					ResourceManager.m_sInstance.m_SwarmResources.SubmitScore(match.GetBestScore());
 				}
 			}
 		);
