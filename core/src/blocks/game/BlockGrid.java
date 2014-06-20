@@ -84,8 +84,6 @@ public class BlockGrid extends InputAdapter
 		
 		m_EmptyPositions = m_NumRows * m_NumCols;
 		
-		PrePopulateGrid();
-		
 		m_UpdateTime = 0;
 		
 		m_FromGridToWorld = new Matrix4();
@@ -101,6 +99,9 @@ public class BlockGrid extends InputAdapter
 			m_NumRows * Block.m_sBlockViewSize
 		);
 		
+		PrePopulateGrid();
+		
+		
 		Gdx.input.setInputProcessor(this);
 		
 		CreateNewFallingPiece();
@@ -108,7 +109,20 @@ public class BlockGrid extends InputAdapter
 	
 	private void PrePopulateGrid()
 	{
+		for(int i = 0; i < m_NumCols; ++i)
+		{
+			int columnHeight = ResourceManager.m_sInstance.m_Random.nextInt(4);
+			
+			for(int k = 0; k < columnHeight; ++k)
+			{
+				Block newBlock = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
+				newBlock.SetGridPos(new Point<Integer>(i, k));
+				
+				InsertBlockInGrid(newBlock);
+			}
+		}
 		
+		ProcessScoringConditions();
 	}
 	
 	public void Render()

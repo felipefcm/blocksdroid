@@ -64,11 +64,10 @@ public class BlocksMatch
 		
 		m_GameSpeed = GameSpeeds[0];
 		
-		m_Score = 0;
-		
 		ReadBestScoreInPreferences();
 
 		m_BlockGrid.Init();
+		m_Score = 0;
 		
 		//for debugging
 		//OnMatchEnded();
