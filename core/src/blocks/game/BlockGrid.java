@@ -101,7 +101,6 @@ public class BlockGrid extends InputAdapter
 		
 		PrePopulateGrid();
 		
-		
 		Gdx.input.setInputProcessor(this);
 		
 		CreateNewFallingPiece();
@@ -117,6 +116,7 @@ public class BlockGrid extends InputAdapter
 			{
 				Block newBlock = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
 				newBlock.SetGridPos(new Point<Integer>(i, k));
+				newBlock.m_IsPlaced = true;
 				
 				InsertBlockInGrid(newBlock);
 			}
