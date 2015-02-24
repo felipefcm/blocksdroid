@@ -29,8 +29,9 @@ public class TutorialScreen extends GameScreen
 		m_TutorialSprite = new Sprite(m_TutorialTexture);
 		
 		m_TutorialSprite.setBounds(0, 0, Blocksdroid.V_WIDTH, Blocksdroid.V_HEIGHT);
-		
-		ResourceManager.m_sInstance.adManager.DisableAds();
+
+		if(ResourceManager.m_sInstance.adManager != null)
+		    ResourceManager.m_sInstance.adManager.DisableAds();
 		
 		Gdx.input.setInputProcessor
 		(
@@ -78,8 +79,9 @@ public class TutorialScreen extends GameScreen
 	public void hide()
 	{
 		dispose();
-		
-		ResourceManager.m_sInstance.adManager.EnableAds();
+
+        if(ResourceManager.m_sInstance.adManager != null)
+		    ResourceManager.m_sInstance.adManager.EnableAds();
 	}
 
 	@Override

@@ -99,7 +99,6 @@ public class ResourceManager
 		
 		camera = new OrthographicCamera();
 		viewport = new FitViewport(Blocksdroid.V_WIDTH, Blocksdroid.V_HEIGHT, camera);
-		viewport.update(screenSize.x, screenSize.y, true);
 		
 		spriteBatch = new SpriteBatch(80);
 		spriteBatch.setProjectionMatrix(camera.combined);
