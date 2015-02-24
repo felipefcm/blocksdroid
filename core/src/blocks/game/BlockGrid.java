@@ -33,7 +33,6 @@ public class BlockGrid extends InputAdapter
 	
 	private SpriteBatch m_SpriteBatch;
 	private ShapeRenderer m_ShapeRenderer;
-	private Point<Integer> m_ViewSize;
 	
 	private Rectangle m_GridArea;
 	
@@ -74,9 +73,8 @@ public class BlockGrid extends InputAdapter
 	
 	public void Init()
 	{
-		m_SpriteBatch = ResourceManager.m_sInstance.m_SpriteBatch;
-		m_ShapeRenderer = ResourceManager.m_sInstance.m_ShapeRenderer;
-		m_ViewSize = ResourceManager.m_sInstance.m_ViewSize;
+		m_SpriteBatch = ResourceManager.m_sInstance.spriteBatch;
+		m_ShapeRenderer = ResourceManager.m_sInstance.shapeRenderer;
 		
 		m_MatchEnded = false;
 		
@@ -88,13 +86,13 @@ public class BlockGrid extends InputAdapter
 		
 		m_FromGridToWorld = new Matrix4();
 		
-		m_FromGridToWorld.trn(m_ViewSize.x * 0.125f, m_ViewSize.y * 0.022f, 0);
+		m_FromGridToWorld.trn(Blocksdroid.V_WIDTH * 0.125f, Blocksdroid.V_HEIGHT * 0.022f, 0);
 		m_FromWorldToGrid = m_FromGridToWorld.cpy().inv();
 		
 		m_GridArea = new Rectangle
 		(
-			m_ViewSize.x * 0.125f, 
-			m_ViewSize.y * 0.022f, 
+            Blocksdroid.V_WIDTH * 0.125f,
+            Blocksdroid.V_HEIGHT * 0.022f,
 			m_NumCols * Block.m_sBlockViewSize, 
 			m_NumRows * Block.m_sBlockViewSize
 		);
@@ -110,7 +108,7 @@ public class BlockGrid extends InputAdapter
 	{
 		for(int i = 0; i < m_NumCols; ++i)
 		{
-			int columnHeight = ResourceManager.m_sInstance.m_Random.nextInt(4);
+			int columnHeight = ResourceManager.m_sInstance.random.nextInt(4);
 			
 			for(int k = 0; k < columnHeight; ++k)
 			{
@@ -140,16 +138,16 @@ public class BlockGrid extends InputAdapter
 			m_ShapeRenderer.setColor(0.75f, 0.75f, 0.75f, 1.0f);
 			m_ShapeRenderer.rect
 			(
-				m_ViewSize.x * 0.12f,
-				m_ViewSize.y * 0.018f,
-				m_ViewSize.x * 0.76f,
-				m_ViewSize.y * 0.685f
+                Blocksdroid.V_WIDTH * 0.12f,
+                Blocksdroid.V_HEIGHT * 0.018f,
+                Blocksdroid.V_WIDTH * 0.76f,
+                Blocksdroid.V_HEIGHT * 0.685f
 			);
 		}
 		m_ShapeRenderer.end();
 		
 		m_SpriteBatch.setTransformMatrix(m_FromGridToWorld);
-		m_SpriteBatch.setProjectionMatrix(ResourceManager.m_sInstance.m_Camera.combined);
+		m_SpriteBatch.setProjectionMatrix(ResourceManager.m_sInstance.camera.combined);
 		
 		m_Matrix.Render(m_SpriteBatch);
 		
@@ -310,7 +308,7 @@ public class BlockGrid extends InputAdapter
 		do
 		{
 			//pick a random column to spawn falling block
-			newPos.x = ResourceManager.m_sInstance.m_Random.nextInt(m_NumCols);
+			newPos.x = ResourceManager.m_sInstance.random.nextInt(m_NumCols);
 		}
 		while(!IsGridPositionAvailable(newPos));
 		
@@ -538,8 +536,8 @@ public class BlockGrid extends InputAdapter
 		
 	private void OnTouchMoveFinished()
 	{		
-		Vector3 srcWorldPos = ResourceManager.m_sInstance.m_Viewport.unproject(new Vector3(m_TouchMoveStartedPoint.x, m_TouchMoveStartedPoint.y, 0));
-		Vector3 dstWorldPos = ResourceManager.m_sInstance.m_Viewport.unproject(new Vector3(m_TouchMoveFinishedPoint.x, m_TouchMoveFinishedPoint.y, 0));
+		Vector3 srcWorldPos = ResourceManager.m_sInstance.viewport.unproject(new Vector3(m_TouchMoveStartedPoint.x, m_TouchMoveStartedPoint.y, 0));
+		Vector3 dstWorldPos = ResourceManager.m_sInstance.viewport.unproject(new Vector3(m_TouchMoveFinishedPoint.x, m_TouchMoveFinishedPoint.y, 0));
 	
 		//FIX
 		if(m_Match.m_PauseButton.getBoundingRectangle().contains(dstWorldPos.x, dstWorldPos.y))

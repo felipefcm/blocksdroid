@@ -12,6 +12,10 @@ public class DesktopLauncher
     {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 
-        new LwjglApplication(new Blocksdroid(null, null), config);
+        config.title = "Blocksdroid";
+        config.width = (int)(Blocksdroid.V_WIDTH * Blocksdroid.DESKTOP_SCALE);
+        config.height = (int)(Blocksdroid.V_HEIGHT * Blocksdroid.DESKTOP_SCALE);
+
+        new LwjglApplication(new Blocksdroid(null), config);
     }
 }

@@ -30,7 +30,6 @@ public class BlocksMatch
 	private BlockGrid m_BlockGrid;
 	private SpriteBatch m_SpriteBatch;
 	private ShapeRenderer m_ShapeRenderer;
-	private Point<Integer> m_ViewSize;
 	private EndMatchWindow m_EndMatchWindow;
 	
 	private int m_Score;
@@ -49,14 +48,13 @@ public class BlocksMatch
 		
 	public void Init()
 	{	
-		m_SpriteBatch = ResourceManager.m_sInstance.m_SpriteBatch;
-		m_ShapeRenderer = ResourceManager.m_sInstance.m_ShapeRenderer;
-		m_ViewSize = ResourceManager.m_sInstance.m_ViewSize;
+		m_SpriteBatch = ResourceManager.m_sInstance.spriteBatch;
+		m_ShapeRenderer = ResourceManager.m_sInstance.shapeRenderer;
 		
 		if(m_PauseButton == null)
 		{
-			m_PauseButton = new Sprite(ResourceManager.m_sInstance.m_PauseButtonRegion);
-			m_PauseButton.setBounds(m_ViewSize.x * 0.8f, m_ViewSize.y * 0.71f, m_ViewSize.x * 0.08f, m_ViewSize.x * 0.08f);
+			m_PauseButton = new Sprite(ResourceManager.m_sInstance.pauseButtonRegion);
+			m_PauseButton.setBounds(Blocksdroid.V_WIDTH * 0.8f, Blocksdroid.V_HEIGHT * 0.71f, Blocksdroid.V_WIDTH * 0.08f, Blocksdroid.V_WIDTH * 0.08f);
 		}
 		
 		m_ShowEndMatchWindow = false;
@@ -77,8 +75,8 @@ public class BlocksMatch
 	{
 		m_SpriteBatch.begin();
 		{
-			ResourceManager.m_sInstance.m_ScoreText.draw(m_SpriteBatch);
-			ResourceManager.m_sInstance.m_AckFont.draw(m_SpriteBatch, "" + m_Score, m_ViewSize.x * 0.45f, m_ViewSize.y * 0.74f);
+			ResourceManager.m_sInstance.scoreText.draw(m_SpriteBatch);
+			ResourceManager.m_sInstance.ackFont.draw(m_SpriteBatch, "" + m_Score, Blocksdroid.V_WIDTH * 0.45f, Blocksdroid.V_HEIGHT * 0.74f);
 			
 			m_PauseButton.draw(m_SpriteBatch);
 		}
@@ -90,15 +88,15 @@ public class BlocksMatch
 			m_ShapeRenderer.begin(ShapeType.Filled);
 			{
 				m_ShapeRenderer.setColor(0, 0, 0, 0.9f);
-				m_ShapeRenderer.rect(0, 0, m_ViewSize.x, m_ViewSize.y);
+				m_ShapeRenderer.rect(0, 0, Blocksdroid.V_WIDTH, Blocksdroid.V_HEIGHT);
 			}
 			m_ShapeRenderer.end();
 			Gdx.gl.glDisable(GL20.GL_BLEND);
 			
 			m_SpriteBatch.begin();
 			{
-				ResourceManager.m_sInstance.m_PausedText.draw(m_SpriteBatch);
-				ResourceManager.m_sInstance.m_TouchToQuitText.draw(m_SpriteBatch);
+				ResourceManager.m_sInstance.pausedText.draw(m_SpriteBatch);
+				ResourceManager.m_sInstance.touchToQuitText.draw(m_SpriteBatch);
 			}
 			m_SpriteBatch.end();
 		}
@@ -174,15 +172,15 @@ public class BlocksMatch
 	{
 		String hash = PreferencesSecurity.m_sInstance.CalculateBestScoreHash(m_BestScore);
 		
-		ResourceManager.m_sInstance.m_Preferences.putString("BestScoreKey", hash);
-		ResourceManager.m_sInstance.m_Preferences.putInteger("BestScore", m_BestScore);
+		ResourceManager.m_sInstance.preferences.putString("BestScoreKey", hash);
+		ResourceManager.m_sInstance.preferences.putInteger("BestScore", m_BestScore);
 		
-		ResourceManager.m_sInstance.m_Preferences.flush();
+		ResourceManager.m_sInstance.preferences.flush();
 	}
 	
 	public void ReadBestScoreInPreferences()
 	{
-		m_BestScore = ResourceManager.m_sInstance.m_Preferences.getInteger("BestScore", 0);
+		m_BestScore = ResourceManager.m_sInstance.preferences.getInteger("BestScore", 0);
 		
 		if(m_BestScore != 0)
 		{

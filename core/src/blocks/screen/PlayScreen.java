@@ -20,7 +20,7 @@ public class PlayScreen extends GameScreen
 	@Override
 	public void show() 
 	{	
-		m_SpriteBatch = ResourceManager.m_sInstance.m_SpriteBatch;
+		m_SpriteBatch = ResourceManager.m_sInstance.spriteBatch;
 		
 		m_Match.Init();
 	}
@@ -28,10 +28,10 @@ public class PlayScreen extends GameScreen
 	@Override
 	public void render(float delta) 
 	{
-		m_SpriteBatch.setTransformMatrix(ResourceManager.m_sInstance.m_IdentityMatrix);
+		m_SpriteBatch.setTransformMatrix(ResourceManager.m_sInstance.identityMatrix);
 		m_SpriteBatch.begin();
 		{
-			ResourceManager.m_sInstance.m_BlocksdroidText.draw(m_SpriteBatch);
+			ResourceManager.m_sInstance.blocksdroidText.draw(m_SpriteBatch);
 		}
 		m_SpriteBatch.end();
 		

@@ -46,36 +46,36 @@ public class Block extends Sprite
 			case Red:
 			{
 				if(!m_IsFixed)
-					this.setRegion(ResourceManager.m_sInstance.m_RedBlockRegion);
+					this.setRegion(ResourceManager.m_sInstance.redBlockRegion);
 				else
-					this.setRegion(ResourceManager.m_sInstance.m_RedBlockFixedRegion);
+					this.setRegion(ResourceManager.m_sInstance.redBlockFixedRegion);
 			}
 			break;
 			
 			case Green:
 			{
 				if(!m_IsFixed)
-					this.setRegion(ResourceManager.m_sInstance.m_GreenBlockRegion);
+					this.setRegion(ResourceManager.m_sInstance.greenBlockRegion);
 				else
-					this.setRegion(ResourceManager.m_sInstance.m_GreenBlockFixedRegion);
+					this.setRegion(ResourceManager.m_sInstance.greenBlockFixedRegion);
 			}
 			break;
 			
 			case Blue:
 			{
 				if(!m_IsFixed)
-					this.setRegion(ResourceManager.m_sInstance.m_BlueBlockRegion);
+					this.setRegion(ResourceManager.m_sInstance.blueBlockRegion);
 				else
-					this.setRegion(ResourceManager.m_sInstance.m_BlueBlockFixedRegion);
+					this.setRegion(ResourceManager.m_sInstance.blueBlockFixedRegion);
 			}
 			break;
 			
 			case Orange:
 			{
 				if(!m_IsFixed)
-					this.setRegion(ResourceManager.m_sInstance.m_OrangeBlockRegion);
+					this.setRegion(ResourceManager.m_sInstance.orangeBlockRegion);
 				else
-					this.setRegion(ResourceManager.m_sInstance.m_OrangeBlockFixedRegion);
+					this.setRegion(ResourceManager.m_sInstance.orangeBlockFixedRegion);
 			}
 			break;
 		}

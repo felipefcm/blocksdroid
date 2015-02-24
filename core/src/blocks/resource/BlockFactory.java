@@ -37,7 +37,7 @@ public class BlockFactory
 	
 	public static Block GetRandomBlock(int maxBlockValue)
 	{
-		int randomValue = ResourceManager.m_sInstance.m_Random.nextInt(maxBlockValue);
+		int randomValue = ResourceManager.m_sInstance.random.nextInt(maxBlockValue);
 		
 		return GetBlock(BlockType.values()[randomValue]);
 	}

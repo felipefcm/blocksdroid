@@ -26,94 +26,88 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class ResourceManager 
 {
 	public static ResourceManager m_sInstance = new ResourceManager();
 	
-	public static final float m_sGameAspectRatio = 3.0f / 4.0f;
+	public static final float m_sGameAspectRatio = 9.0f / 16.0f;
 	
-//Useful references --------------------------------------------------
-	public Blocksdroid m_Game;
-	public Random m_Random;
-	public Point<Integer> m_ScreenSize;
-	public Point<Integer> m_ViewSize;
+    //Useful references --------------------------------------------------
+	public Blocksdroid game;
+	public Random random;
+	public Point<Integer> screenSize;
 	
-	public Viewport m_Viewport;
-	public OrthographicCamera m_Camera;
-	public ShapeRenderer m_ShapeRenderer;
-	public SpriteBatch m_SpriteBatch;
+	public FitViewport viewport;
+	public OrthographicCamera camera;
+	public ShapeRenderer shapeRenderer;
+	public SpriteBatch spriteBatch;
 	
-	public final Matrix4 m_IdentityMatrix = new Matrix4();
+	public final Matrix4 identityMatrix = new Matrix4();
 	
-	public Preferences m_Preferences;
+	public Preferences preferences;
 	
-	public AdManager m_AdManager;
-	public SwarmResources m_SwarmResources;
-//--------------------------------------------------------------------
+	public AdManager adManager;
+    //--------------------------------------------------------------------
 	
-//Textures -----------------------------------------------------------
-	public Texture m_BlockTexture;
-	public TextureRegion m_RedBlockRegion;
-	public TextureRegion m_GreenBlockRegion;
-	public TextureRegion m_BlueBlockRegion;
-	public TextureRegion m_OrangeBlockRegion;
-	public TextureRegion m_RedBlockFixedRegion;
-	public TextureRegion m_GreenBlockFixedRegion;
-	public TextureRegion m_BlueBlockFixedRegion;
-	public TextureRegion m_OrangeBlockFixedRegion;
+    //Textures -----------------------------------------------------------
+	public Texture blockTexture;
+	public TextureRegion redBlockRegion;
+	public TextureRegion greenBlockRegion;
+	public TextureRegion blueBlockRegion;
+	public TextureRegion orangeBlockRegion;
+	public TextureRegion redBlockFixedRegion;
+	public TextureRegion greenBlockFixedRegion;
+	public TextureRegion blueBlockFixedRegion;
+	public TextureRegion orangeBlockFixedRegion;
 	
-	public Texture m_MainSkinTexture;
-	public TextureRegion m_ButtonUpRegion;
-	public TextureRegion m_ButtonDownRegion;
-	public TextureRegion m_RetryButtonRegion;
-	public TextureRegion m_CancelButtonRegion;
-	public TextureRegion m_PauseButtonRegion;
-//--------------------------------------------------------------------
+	public Texture mainSkinTexture;
+	public TextureRegion buttonUpRegion;
+	public TextureRegion buttonDownRegion;
+	public TextureRegion retryButtonRegion;
+	public TextureRegion cancelButtonRegion;
+	public TextureRegion pauseButtonRegion;
+    //--------------------------------------------------------------------
 	
-//Fonts --------------------------------------------------------------
-	public BitmapFont m_BloxFont;
-	public BitmapFontCache m_BlocksdroidText;
-	public BitmapFont m_AckFont;
-	public BitmapFontCache m_ScoreText;
-	public BitmapFontCache m_PausedText;
-	public BitmapFontCache m_TouchToQuitText;
-//--------------------------------------------------------------------
+    //Fonts --------------------------------------------------------------
+	public BitmapFont bloxFont;
+	public BitmapFontCache blocksdroidText;
+	public BitmapFont ackFont;
+	public BitmapFontCache scoreText;
+	public BitmapFontCache pausedText;
+	public BitmapFontCache touchToQuitText;
+    //--------------------------------------------------------------------
 	
-//Skin styles --------------------------------------------------------
-	public TextButtonStyle m_TextButtonStyle;
-	public ButtonStyle m_RetryButtonStyle;
-	public ButtonStyle m_CancelButtonStyle;
-	public LabelStyle m_TitleLabelStyle;
-	public LabelStyle m_AckLabelStyle;
-//--------------------------------------------------------------------
+    //Skin styles --------------------------------------------------------
+	public TextButtonStyle textButtonStyle;
+	public ButtonStyle retryButtonStyle;
+	public ButtonStyle cancelButtonStyle;
+	public LabelStyle titleLabelStyle;
+	public LabelStyle ackLabelStyle;
+    //--------------------------------------------------------------------
 	
 	public boolean Init(final Blocksdroid game)
 	{
-		m_Game = game;
+		this.game = game;
 		
 		long seed = new Date().getTime();
-		m_Random = new Random(seed);
+		random = new Random(seed);
 		Log.Write("Using random seed: " + seed);
 		
-		m_ScreenSize = new Point<Integer>(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		Log.Write("Screen size: W=" + m_ScreenSize.x + " H=" + m_ScreenSize.y);
+		screenSize = new Point<Integer>(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		Log.Write("Screen size: W=" + screenSize.x + " H=" + screenSize.y);
 		
-		m_ViewSize = new Point<Integer>(m_ScreenSize.x, (int)(m_ScreenSize.x / m_sGameAspectRatio));
-		Log.Write("View size: W=" + m_ViewSize.x + " H=" + m_ViewSize.y);
+		camera = new OrthographicCamera();
+		viewport = new FitViewport(Blocksdroid.V_WIDTH, Blocksdroid.V_HEIGHT, camera);
+		viewport.update(screenSize.x, screenSize.y, true);
 		
-		m_Camera = new OrthographicCamera();
-		m_Viewport = new FitViewport(m_ViewSize.x, m_ViewSize.y, m_Camera);
-		m_Viewport.update(m_ScreenSize.x, m_ScreenSize.y, true);
+		spriteBatch = new SpriteBatch(80);
+		spriteBatch.setProjectionMatrix(camera.combined);
 		
-		m_SpriteBatch = new SpriteBatch(80);
-		m_SpriteBatch.setProjectionMatrix(m_Camera.combined);
+		shapeRenderer = new ShapeRenderer();
+		shapeRenderer.setProjectionMatrix(camera.combined);
 		
-		m_ShapeRenderer = new ShapeRenderer();
-		m_ShapeRenderer.setProjectionMatrix(m_Camera.combined);
-		
-		m_Preferences = Gdx.app.getPreferences("Blocksdroid_Prefs");
+		preferences = Gdx.app.getPreferences("Blocksdroid_Prefs");
 		
 		if(!InitCommonResources())
 			return false;
@@ -123,115 +117,115 @@ public class ResourceManager
 	
 	private boolean InitCommonResources()
 	{		
-	//font -----------------------------------------------------------
-		m_BloxFont = new BitmapFont(Gdx.files.internal("fonts/blox.fnt"));
-		m_BloxFont.setScale(m_ViewSize.x * 0.0035f);
-		m_BloxFont.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+	    //font -----------------------------------------------------------
+		bloxFont = new BitmapFont(Gdx.files.internal("fonts/blox.fnt"));
+		bloxFont.setScale(Blocksdroid.V_WIDTH * 0.0035f);
+		bloxFont.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
-		m_AckFont = new BitmapFont(Gdx.files.internal("fonts/ack.fnt"));
-		m_AckFont.setScale(m_ViewSize.x * 0.0011f);
+		ackFont = new BitmapFont(Gdx.files.internal("fonts/ack.fnt"));
+		ackFont.setScale(Blocksdroid.V_WIDTH * 0.0011f);
 		
-		TextBounds bounds = m_BloxFont.getBounds("BLOCKSDROID");
+		TextBounds bounds = bloxFont.getBounds("BLOCKSDROID");
 
-		m_BlocksdroidText = new BitmapFontCache(m_BloxFont);
-		m_BlocksdroidText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
-		m_BlocksdroidText.addText("BLOCKSDROID", (m_ViewSize.x - bounds.width) / 2.0f, m_ViewSize.y * 0.9f);
+		blocksdroidText = new BitmapFontCache(bloxFont);
+		blocksdroidText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
+		blocksdroidText.addText("BLOCKSDROID", (Blocksdroid.V_WIDTH - bounds.width) / 2.0f, Blocksdroid.V_HEIGHT * 0.9f);
 		
-		m_ScoreText = new BitmapFontCache(m_AckFont);
-		m_ScoreText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
-		m_ScoreText.addText("SCORE:",  m_ViewSize.x * 0.125f, m_ViewSize.y * 0.74f);
+		scoreText = new BitmapFontCache(ackFont);
+		scoreText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
+		scoreText.addText("SCORE:", Blocksdroid.V_WIDTH * 0.125f, Blocksdroid.V_HEIGHT * 0.74f);
 		
-		bounds = m_AckFont.getBounds("PAUSED");
+		bounds = ackFont.getBounds("PAUSED");
 		
-		m_PausedText = new BitmapFontCache(m_AckFont);
-		m_PausedText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
-		m_PausedText.addText("PAUSED", (m_ViewSize.x - bounds.width) / 2.0f, (m_ViewSize.y - bounds.height) / 2.0f + m_ViewSize.y * 0.03f);
+		pausedText = new BitmapFontCache(ackFont);
+		pausedText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
+		pausedText.addText("PAUSED", (Blocksdroid.V_WIDTH - bounds.width) / 2.0f, (Blocksdroid.V_HEIGHT - bounds.height) / 2.0f + Blocksdroid.V_HEIGHT * 0.03f);
 		
-		bounds = m_AckFont.getBounds("TOUCH TO RESUME");
+		bounds = ackFont.getBounds("TOUCH TO RESUME");
 		
-		m_TouchToQuitText = new BitmapFontCache(m_AckFont);
-		m_TouchToQuitText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
-		m_TouchToQuitText.addText("TOUCH TO RESUME", (m_ViewSize.x - bounds.width) / 2.0f, (m_ViewSize.y - bounds.height) / 2.0f - m_ViewSize.y * 0.03f);		
-	//----------------------------------------------------------------
+		touchToQuitText = new BitmapFontCache(ackFont);
+		touchToQuitText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
+		touchToQuitText.addText("TOUCH TO RESUME", (Blocksdroid.V_WIDTH - bounds.width) / 2.0f, (Blocksdroid.V_HEIGHT - bounds.height) / 2.0f - Blocksdroid.V_HEIGHT * 0.03f);
+	    //----------------------------------------------------------------
 		
-	//textures -------------------------------------------------------
-		m_BlockTexture = new Texture(Gdx.files.internal("gfx/blocks.png"));
+	    //textures -------------------------------------------------------
+		blockTexture = new Texture(Gdx.files.internal("gfx/blocks.png"));
 		
-		m_RedBlockRegion = new TextureRegion(m_BlockTexture, 0, 0, 64, 64);
-		m_GreenBlockRegion = new TextureRegion(m_BlockTexture, 64, 0, 64, 64);
-		m_BlueBlockRegion = new TextureRegion(m_BlockTexture, 128, 0, 64, 64);
-		m_OrangeBlockRegion = new TextureRegion(m_BlockTexture, 192, 0, 64, 64);
+		redBlockRegion = new TextureRegion(blockTexture, 0, 0, 64, 64);
+		greenBlockRegion = new TextureRegion(blockTexture, 64, 0, 64, 64);
+		blueBlockRegion = new TextureRegion(blockTexture, 128, 0, 64, 64);
+		orangeBlockRegion = new TextureRegion(blockTexture, 192, 0, 64, 64);
 		
-		m_RedBlockFixedRegion = new TextureRegion(m_BlockTexture, 0, 64, 64, 64);
-		m_GreenBlockFixedRegion = new TextureRegion(m_BlockTexture, 64, 64, 64, 64);
-		m_BlueBlockFixedRegion = new TextureRegion(m_BlockTexture, 128, 64, 64, 64);
-		m_OrangeBlockFixedRegion = new TextureRegion(m_BlockTexture, 192, 64, 64, 64);
+		redBlockFixedRegion = new TextureRegion(blockTexture, 0, 64, 64, 64);
+		greenBlockFixedRegion = new TextureRegion(blockTexture, 64, 64, 64, 64);
+		blueBlockFixedRegion = new TextureRegion(blockTexture, 128, 64, 64, 64);
+		orangeBlockFixedRegion = new TextureRegion(blockTexture, 192, 64, 64, 64);
 		
-		Block.m_sBlockViewSize = m_ViewSize.x * 0.15f;
+		Block.m_sBlockViewSize = Blocksdroid.V_WIDTH * 0.15f;
 		
-		m_MainSkinTexture = new Texture(Gdx.files.internal("gfx/UI/main_skin.png"));
-		m_MainSkinTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		mainSkinTexture = new Texture(Gdx.files.internal("gfx/UI/main_skin.png"));
+		mainSkinTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
-		m_ButtonUpRegion = new TextureRegion(m_MainSkinTexture, 0, 0, 128, 32);
-		m_ButtonDownRegion = new TextureRegion(m_MainSkinTexture, 0, 32, 128, 32);
-		m_RetryButtonRegion = new TextureRegion(m_MainSkinTexture, 0, 64, 32, 32);
-		m_CancelButtonRegion = new TextureRegion(m_MainSkinTexture, 32, 64, 32, 32);
-		m_PauseButtonRegion = new TextureRegion(m_MainSkinTexture, 64, 64, 32, 32);
-	//----------------------------------------------------------------
+		buttonUpRegion = new TextureRegion(mainSkinTexture, 0, 0, 128, 32);
+		buttonDownRegion = new TextureRegion(mainSkinTexture, 0, 32, 128, 32);
+		retryButtonRegion = new TextureRegion(mainSkinTexture, 0, 64, 32, 32);
+		cancelButtonRegion = new TextureRegion(mainSkinTexture, 32, 64, 32, 32);
+		pauseButtonRegion = new TextureRegion(mainSkinTexture, 64, 64, 32, 32);
+	    //----------------------------------------------------------------
 		
-	//skin -----------------------------------------------------------
-		m_TextButtonStyle = new TextButtonStyle
+	    //skin -----------------------------------------------------------
+		textButtonStyle = new TextButtonStyle
 		(
-			new TextureRegionDrawable(m_ButtonUpRegion),
-			new TextureRegionDrawable(m_ButtonDownRegion),
-			new TextureRegionDrawable(m_ButtonUpRegion),
-			m_AckFont
+			new TextureRegionDrawable(buttonUpRegion),
+			new TextureRegionDrawable(buttonDownRegion),
+			new TextureRegionDrawable(buttonUpRegion),
+                ackFont
 		);
 		
-		m_RetryButtonStyle = new ButtonStyle
+		retryButtonStyle = new ButtonStyle
 		(
-			new TextureRegionDrawable(m_RetryButtonRegion),
-			new TextureRegionDrawable(m_RetryButtonRegion),
-			new TextureRegionDrawable(m_RetryButtonRegion)
+			new TextureRegionDrawable(retryButtonRegion),
+			new TextureRegionDrawable(retryButtonRegion),
+			new TextureRegionDrawable(retryButtonRegion)
 		);
 		
-		m_CancelButtonStyle = new ButtonStyle
+		cancelButtonStyle = new ButtonStyle
 		(
-			new TextureRegionDrawable(m_CancelButtonRegion),
-			new TextureRegionDrawable(m_CancelButtonRegion),
-			new TextureRegionDrawable(m_CancelButtonRegion)
+			new TextureRegionDrawable(cancelButtonRegion),
+			new TextureRegionDrawable(cancelButtonRegion),
+			new TextureRegionDrawable(cancelButtonRegion)
 		);
 				
-		m_TitleLabelStyle = new LabelStyle
+		titleLabelStyle = new LabelStyle
 		(
-			m_BloxFont, 
+                bloxFont,
 			new Color(Color.rgba8888(0.93f, 0.95f, 0.95f, 1.0f))
 		);
 		
-		m_AckLabelStyle = new LabelStyle
+		ackLabelStyle = new LabelStyle
 		(
-			m_AckFont, 
+                ackFont,
 			new Color(Color.rgba8888(0.93f, 0.95f, 0.95f, 1.0f))
 		);
-	//----------------------------------------------------------------
+	    //----------------------------------------------------------------
 		
 		return true;
 	}
 	
 	public void DisposeCommonResources()
 	{
-		m_MainSkinTexture.dispose();
-		m_BlockTexture.dispose();
-		m_AckFont.dispose();
-		m_BloxFont.dispose();
+		mainSkinTexture.dispose();
+		blockTexture.dispose();
+		ackFont.dispose();
+		bloxFont.dispose();
 	}
 	
 	public void Dispose()
 	{
 		DisposeCommonResources();
 		
-		m_ShapeRenderer.dispose();
-		m_SpriteBatch.dispose();
+		shapeRenderer.dispose();
+		spriteBatch.dispose();
 	}
 }
 

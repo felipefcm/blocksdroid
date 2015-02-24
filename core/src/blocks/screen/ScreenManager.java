@@ -25,7 +25,7 @@ public class ScreenManager
 	
 	public boolean Init()
 	{
-		m_Game = ResourceManager.m_sInstance.m_Game;
+		m_Game = ResourceManager.m_sInstance.game;
 		
 		//initial scene
 		SetScreen(new MainMenuScreen());

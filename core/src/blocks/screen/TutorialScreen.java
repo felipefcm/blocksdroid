@@ -1,6 +1,7 @@
 
 package blocks.screen;
 
+import blocks.game.Blocksdroid;
 import blocks.resource.Point;
 import blocks.resource.ResourceManager;
 import blocks.screen.ScreenManager.ScreenType;
@@ -18,20 +19,18 @@ public class TutorialScreen extends GameScreen
 	private Sprite m_TutorialSprite;
 	
 	private SpriteBatch m_Batch;
-	private Point<Integer> m_ViewSize;
 	
 	@Override
 	public void show()
 	{
-		m_Batch = ResourceManager.m_sInstance.m_SpriteBatch;
-		m_ViewSize = ResourceManager.m_sInstance.m_ViewSize;
+		m_Batch = ResourceManager.m_sInstance.spriteBatch;
 		
 		m_TutorialTexture = new Texture(Gdx.files.internal("gfx/tutorial.png"));
 		m_TutorialSprite = new Sprite(m_TutorialTexture);
 		
-		m_TutorialSprite.setBounds(0, 0, m_ViewSize.x, m_ViewSize.y);
+		m_TutorialSprite.setBounds(0, 0, Blocksdroid.V_WIDTH, Blocksdroid.V_HEIGHT);
 		
-		ResourceManager.m_sInstance.m_AdManager.DisableAds();
+		ResourceManager.m_sInstance.adManager.DisableAds();
 		
 		Gdx.input.setInputProcessor
 		(
@@ -62,7 +61,7 @@ public class TutorialScreen extends GameScreen
 	@Override
 	public void render(float delta)
 	{
-		m_Batch.setTransformMatrix(ResourceManager.m_sInstance.m_IdentityMatrix);
+		m_Batch.setTransformMatrix(ResourceManager.m_sInstance.identityMatrix);
 		m_Batch.begin();
 		{
 			m_TutorialSprite.draw(m_Batch);
@@ -80,7 +79,7 @@ public class TutorialScreen extends GameScreen
 	{
 		dispose();
 		
-		ResourceManager.m_sInstance.m_AdManager.EnableAds();
+		ResourceManager.m_sInstance.adManager.EnableAds();
 	}
 
 	@Override

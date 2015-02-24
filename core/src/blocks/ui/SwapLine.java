@@ -1,6 +1,7 @@
 
 package blocks.ui;
 
+import blocks.game.Blocksdroid;
 import blocks.resource.ResourceManager;
 
 import com.badlogic.gdx.Gdx;
@@ -60,7 +61,7 @@ public class SwapLine
 		m_Alpha = 1.0f - m_Elapsed / m_Duration;
 		
 		Gdx.gl.glEnable(GL20.GL_BLEND);
-		Gdx.gl.glLineWidth(ResourceManager.m_sInstance.m_ViewSize.y * 0.00625f);
+		Gdx.gl.glLineWidth(Blocksdroid.V_HEIGHT * 0.00625f);
 		
 		shapeRenderer.begin(ShapeType.Line);
 		{

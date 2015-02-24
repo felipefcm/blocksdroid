@@ -4,7 +4,6 @@ package blocks.game;
 import blocks.ad.AdManager;
 import blocks.resource.Log;
 import blocks.resource.ResourceManager;
-import blocks.resource.SwarmResources;
 import blocks.screen.ScreenManager;
 
 import com.badlogic.gdx.Game;
@@ -15,12 +14,15 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
 public class Blocksdroid extends Game
 {
+    public static final int V_WIDTH = 720;
+    public static final int V_HEIGHT = 1280;
+    public static final float DESKTOP_SCALE = 0.7f;
+
 	private ShapeRenderer m_ShapeRenderer;
 	
-	public Blocksdroid(AdManager adManager, SwarmResources swarmResources)
+	public Blocksdroid(AdManager adManager)
 	{
-		ResourceManager.m_sInstance.m_AdManager = adManager;
-		ResourceManager.m_sInstance.m_SwarmResources = swarmResources;
+		ResourceManager.m_sInstance.adManager = adManager;
 	}
 	
 	@Override
@@ -34,9 +36,7 @@ public class Blocksdroid extends Game
 		if(!ScreenManager.m_sInstance.Init())
 			Log.Write("Failed to init ScreenManager");
 		
-		ResourceManager.m_sInstance.m_SwarmResources.PreLoadSwarm();
-		
-		m_ShapeRenderer = ResourceManager.m_sInstance.m_ShapeRenderer;
+		m_ShapeRenderer = ResourceManager.m_sInstance.shapeRenderer;
 		
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -54,8 +54,8 @@ public class Blocksdroid extends Game
 			m_ShapeRenderer.rect
 			(
 				0, 0,
-				ResourceManager.m_sInstance.m_Viewport.getViewportWidth(),
-				ResourceManager.m_sInstance.m_Viewport.getViewportHeight()
+                Blocksdroid.V_WIDTH,
+                Blocksdroid.V_HEIGHT
 			);
 		}
 		m_ShapeRenderer.end();
@@ -66,9 +66,9 @@ public class Blocksdroid extends Game
 	@Override
 	public void resize(int width, int height) 
 	{
-		ResourceManager.m_sInstance.m_Viewport.update(width, height, true);
+		ResourceManager.m_sInstance.viewport.update(width, height, true);
 		
-		m_ShapeRenderer.setProjectionMatrix(ResourceManager.m_sInstance.m_Camera.combined);
+		m_ShapeRenderer.setProjectionMatrix(ResourceManager.m_sInstance.camera.combined);
 		
 		super.resize(width, height);
 	}

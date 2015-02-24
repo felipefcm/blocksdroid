@@ -1,6 +1,7 @@
 
 package blocks.screen;
 
+import blocks.game.Blocksdroid;
 import blocks.resource.Point;
 import blocks.resource.ResourceManager;
 import blocks.screen.ScreenManager.ScreenType;
@@ -31,7 +32,6 @@ public class MainMenuScreen extends GameScreen
 	
 	private SpriteBatch m_Batch;
 	private Viewport m_Viewport;
-	private Point<Integer> m_ViewSize;
 	
 	public MainMenuScreen()
 	{
@@ -40,11 +40,11 @@ public class MainMenuScreen extends GameScreen
 	@Override
 	public void show()
 	{	
-		m_Batch = ResourceManager.m_sInstance.m_SpriteBatch;
-		m_Viewport = ResourceManager.m_sInstance.m_Viewport;
-		m_ViewSize = ResourceManager.m_sInstance.m_ViewSize;
-		
-		ResourceManager.m_sInstance.m_AdManager.EnableAds();
+		m_Batch = ResourceManager.m_sInstance.spriteBatch;
+		m_Viewport = ResourceManager.m_sInstance.viewport;
+
+		if(ResourceManager.m_sInstance.adManager != null)
+		    ResourceManager.m_sInstance.adManager.EnableAds();
 				
 		m_Table = new Table();
 		m_Table.setFillParent(true);
@@ -54,8 +54,8 @@ public class MainMenuScreen extends GameScreen
 		
 		Gdx.input.setInputProcessor(m_Stage);
 		
-		LabelStyle labelStyle = ResourceManager.m_sInstance.m_TitleLabelStyle;
-		TextButtonStyle textButtonStyle = ResourceManager.m_sInstance.m_TextButtonStyle;
+		LabelStyle labelStyle = ResourceManager.m_sInstance.titleLabelStyle;
+		TextButtonStyle textButtonStyle = ResourceManager.m_sInstance.textButtonStyle;
 		
 		m_TitleLabel = new Label("BLOCKSDROID", labelStyle);
 		m_PlayButton = new TextButton("PLAY", textButtonStyle);
@@ -94,7 +94,7 @@ public class MainMenuScreen extends GameScreen
 				@Override
 				public void clicked(InputEvent event, float x, float y)
 				{
-					ResourceManager.m_sInstance.m_SwarmResources.ShowLeaderboard();
+
 				}
 			}
 		);
@@ -107,19 +107,19 @@ public class MainMenuScreen extends GameScreen
 				public void clicked(InputEvent event, float x, float y)
 				{
 					dispose();
-					ResourceManager.m_sInstance.m_Game.OnExit();
+					ResourceManager.m_sInstance.game.OnExit();
 				}
 			}
 		);
 		
-		float buttonsWidth = m_ViewSize.x * 0.8f;
-		float buttonsHeight = m_ViewSize.y * 0.12f;
-		float buttonsSpacing = m_ViewSize.y * 0.0078f;
+		float buttonsWidth = Blocksdroid.V_WIDTH * 0.8f;
+		float buttonsHeight = Blocksdroid.V_HEIGHT * 0.12f;
+		float buttonsSpacing = Blocksdroid.V_HEIGHT * 0.0078f;
 		
-		m_Table.add(m_TitleLabel).padBottom(m_ViewSize.y * 0.02f);
+		m_Table.add(m_TitleLabel).padBottom(Blocksdroid.V_HEIGHT * 0.02f);
 		m_Table.row();
 		
-		m_Table.add(m_PlayButton).width(buttonsWidth).height(buttonsHeight).padTop(m_ViewSize.y * 0.08f).spaceBottom(buttonsSpacing);
+		m_Table.add(m_PlayButton).width(buttonsWidth).height(buttonsHeight).padTop(Blocksdroid.V_HEIGHT * 0.08f).spaceBottom(buttonsSpacing);
 		m_Table.row();
 		m_Table.add(m_TutorialButton).width(buttonsWidth).height(buttonsHeight).spaceBottom(buttonsSpacing);
 		m_Table.row();
