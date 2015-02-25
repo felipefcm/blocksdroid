@@ -46,7 +46,7 @@ public class Blocksdroid extends Game
 	public void render() 
 	{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
+
 		//paints the viewport area
 		m_ShapeRenderer.begin(ShapeType.Filled);
 		{
@@ -59,6 +59,8 @@ public class Blocksdroid extends Game
 			);
 		}
 		m_ShapeRenderer.end();
+
+        ResourceManager.instance.tweenManager.update(Gdx.graphics.getDeltaTime());
 		
 		super.render();
 	}

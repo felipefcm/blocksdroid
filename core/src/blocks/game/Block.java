@@ -1,6 +1,7 @@
 
 package blocks.game;
 
+import aurelienribon.tweenengine.TweenAccessor;
 import blocks.resource.Point;
 import blocks.resource.ResourceManager;
 

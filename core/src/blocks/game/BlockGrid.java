@@ -1,6 +1,10 @@
 
 package blocks.game;
 
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenManager;
+import aurelienribon.tweenengine.equations.Bounce;
+import aurelienribon.tweenengine.equations.Linear;
 import blocks.game.Block.BlockType;
 import blocks.resource.BlockFactory;
 import blocks.resource.Log;
@@ -47,6 +51,8 @@ public class BlockGrid extends InputAdapter
 	private Point<Integer> touchMoveStartedPoint;
 	private Point<Integer> touchMoveFinishedPoint;
 
+	private TweenManager tweenManager;
+
 	private final float minTouchLength = Block.BlockViewSize * 0.4f;
 	private final float maxTouchLength = Block.BlockViewSize * 3.0f;
 	
@@ -70,12 +76,15 @@ public class BlockGrid extends InputAdapter
 		
 		touchMoveStartedPoint = new Point<Integer>();
 		touchMoveFinishedPoint = new Point<Integer>();
+
+        Tween.registerAccessor(Block.class, new BlockAccessor());
 	}
 	
 	public void Init()
 	{
 		spriteBatch = ResourceManager.instance.spriteBatch;
 		shapeRenderer = ResourceManager.instance.shapeRenderer;
+		tweenManager = ResourceManager.instance.tweenManager;
 		
 		matchEnded = false;
 		
@@ -223,8 +232,18 @@ public class BlockGrid extends InputAdapter
 		blockA.SetGridPos(bGridPos);
 		blockB.SetGridPos(aGridPos);
 		
-		blockA.setPosition(bGridPos.x * Block.BlockViewSize, bGridPos.y * Block.BlockViewSize);
-		blockB.setPosition(aGridPos.x * Block.BlockViewSize, aGridPos.y * Block.BlockViewSize);
+		//blockA.setPosition(bGridPos.x * Block.BlockViewSize, bGridPos.y * Block.BlockViewSize);
+		//blockB.setPosition(aGridPos.x * Block.BlockViewSize, aGridPos.y * Block.BlockViewSize);
+
+        Tween.to(blockA, BlockAccessor.PositionXY, 0.1f)
+             .target(bGridPos.x * Block.BlockViewSize, bGridPos.y * Block.BlockViewSize)
+             .ease(Linear.INOUT)
+             .start(tweenManager);
+
+        Tween.to(blockB, BlockAccessor.PositionXY, 0.1f)
+             .target(aGridPos.x * Block.BlockViewSize, aGridPos.y * Block.BlockViewSize)
+             .ease(Linear.INOUT)
+             .start(tweenManager);
 		
 		return true;
 	}

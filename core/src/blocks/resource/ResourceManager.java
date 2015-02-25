@@ -4,6 +4,7 @@ package blocks.resource;
 import java.util.Date;
 import java.util.Random;
 
+import aurelienribon.tweenengine.TweenManager;
 import blocks.ad.AdManager;
 import blocks.game.Block;
 import blocks.game.Blocksdroid;
@@ -48,6 +49,8 @@ public class ResourceManager
 	public Preferences preferences;
 	
 	public AdManager adManager;
+
+	public TweenManager tweenManager;
     //--------------------------------------------------------------------
 	
     //Textures -----------------------------------------------------------
@@ -107,6 +110,8 @@ public class ResourceManager
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		
 		preferences = Gdx.app.getPreferences("Blocksdroid_Prefs");
+
+		tweenManager = new TweenManager();
 		
 		if(!InitCommonResources())
 			return false;
