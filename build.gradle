@@ -62,6 +62,8 @@ project(":android")
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
 
         compile 'com.google.android.gms:play-services:6.+'
+
+        compile fileTree(dir: '../libs', include: '*.jar')
     }
 }
 
@@ -71,6 +73,8 @@ project(":core") {
     dependencies
     {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+
+        compile fileTree(dir: '../libs', include: '*.jar')
     }
 }
 

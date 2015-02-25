@@ -160,7 +160,7 @@ public class BlockGrid extends InputAdapter
 		matrix.ClearAll();
 	}
 	
-//Grid management --------------------------------------------------------
+    //Grid management --------------------------------------------------------
 	private boolean IsGridPositionAvailable(Point<Integer> gridPosition)
 	{
 		return (matrix.GetAt(gridPosition) == null);
@@ -293,9 +293,9 @@ public class BlockGrid extends InputAdapter
 				MoveBlockInGrid(block, new Point<Integer>(j, k + 1));
 			}
 	}
-//------------------------------------------------------------------------
+    //------------------------------------------------------------------------
 	
-//Falling piece ----------------------------------------------------------
+    //Falling piece ----------------------------------------------------------
 	private void CreateNewFallingPiece()
 	{
 		if(emptyPositions == 0)
@@ -324,9 +324,9 @@ public class BlockGrid extends InputAdapter
 		//'nextGridPos' is already checked by 'onTimePassed' function
 		MoveBlockInGrid(fallingPiece, nextGridPos);
 	}	
-//------------------------------------------------------------------------
+    //------------------------------------------------------------------------
 	
-//Piece elimination ------------------------------------------------------
+    //Piece elimination ------------------------------------------------------
 	private class EliminationData
 	{
 		public EliminationData(int pos, int count)
@@ -470,9 +470,9 @@ public class BlockGrid extends InputAdapter
 		for(int i = 0; i < count; ++i)
 			RemoveBlockFromGrid(new Point<Integer>(rightMost - i, row));
 	}
-//------------------------------------------------------------------------
+    //------------------------------------------------------------------------
 	
-//Events -----------------------------------------------------------------
+    //Events -----------------------------------------------------------------
 	public void UpdateGame() 
 	{	
 		if(matchEnded)
@@ -674,5 +674,5 @@ public class BlockGrid extends InputAdapter
 		
 		srcBlock.SetFixed(true);
 	}
-//------------------------------------------------------------------------
+    //------------------------------------------------------------------------
 }
