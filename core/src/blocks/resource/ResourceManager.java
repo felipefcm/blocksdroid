@@ -155,26 +155,26 @@ public class ResourceManager
 	    //textures -------------------------------------------------------
 		blockTexture = new Texture(Gdx.files.internal("gfx/blocks.png"));
 		
-		redBlockRegion = new TextureRegion(blockTexture, 0, 0, 64, 64);
-		greenBlockRegion = new TextureRegion(blockTexture, 64, 0, 64, 64);
-		blueBlockRegion = new TextureRegion(blockTexture, 128, 0, 64, 64);
-		orangeBlockRegion = new TextureRegion(blockTexture, 192, 0, 64, 64);
+		redBlockRegion = new TextureRegion(blockTexture, 0, 0, 128, 128);
+		greenBlockRegion = new TextureRegion(blockTexture, 128, 0, 128, 128);
+		blueBlockRegion = new TextureRegion(blockTexture, 256, 0, 128, 128);
+		orangeBlockRegion = new TextureRegion(blockTexture, 384, 0, 128, 128);
 		
-		redBlockFixedRegion = new TextureRegion(blockTexture, 0, 64, 64, 64);
-		greenBlockFixedRegion = new TextureRegion(blockTexture, 64, 64, 64, 64);
-		blueBlockFixedRegion = new TextureRegion(blockTexture, 128, 64, 64, 64);
-		orangeBlockFixedRegion = new TextureRegion(blockTexture, 192, 64, 64, 64);
+		redBlockFixedRegion = new TextureRegion(blockTexture, 0, 128, 128, 128);
+		greenBlockFixedRegion = new TextureRegion(blockTexture, 128, 128, 128, 128);
+		blueBlockFixedRegion = new TextureRegion(blockTexture, 256, 128, 128, 128);
+		orangeBlockFixedRegion = new TextureRegion(blockTexture, 384, 128, 128, 128);
 		
 		Block.BlockViewSize = Blocksdroid.V_WIDTH * 0.15f;
 		
 		mainSkinTexture = new Texture(Gdx.files.internal("gfx/UI/main_skin.png"));
 		mainSkinTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
-		buttonUpRegion = new TextureRegion(mainSkinTexture, 0, 0, 128, 32);
-		buttonDownRegion = new TextureRegion(mainSkinTexture, 0, 32, 128, 32);
-		retryButtonRegion = new TextureRegion(mainSkinTexture, 0, 64, 32, 32);
-		cancelButtonRegion = new TextureRegion(mainSkinTexture, 32, 64, 32, 32);
-		pauseButtonRegion = new TextureRegion(mainSkinTexture, 64, 64, 32, 32);
+		buttonUpRegion = new TextureRegion(mainSkinTexture, 0, 0, 512, 128);
+		buttonDownRegion = new TextureRegion(mainSkinTexture, 0, 128, 512, 128);
+		retryButtonRegion = new TextureRegion(mainSkinTexture, 0, 256, 128, 128);
+		cancelButtonRegion = new TextureRegion(mainSkinTexture, 128, 256, 128, 128);
+		pauseButtonRegion = new TextureRegion(mainSkinTexture, 256, 256, 128, 128);
 	    //----------------------------------------------------------------
 		
 	    //skin -----------------------------------------------------------

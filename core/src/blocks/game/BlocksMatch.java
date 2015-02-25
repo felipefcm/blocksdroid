@@ -53,7 +53,7 @@ public class BlocksMatch
 		if(pauseButton == null)
 		{
 			pauseButton = new Sprite(ResourceManager.instance.pauseButtonRegion);
-			pauseButton.setBounds(Blocksdroid.V_WIDTH * 0.8f, Blocksdroid.V_HEIGHT * 0.71f, Blocksdroid.V_WIDTH * 0.08f, Blocksdroid.V_WIDTH * 0.08f);
+			pauseButton.setBounds(Blocksdroid.V_WIDTH * 0.8f, Blocksdroid.V_HEIGHT * 0.71f, Blocksdroid.V_WIDTH * 0.09f, Blocksdroid.V_WIDTH * 0.09f);
 		}
 		
 		showEndMatchWindow = false;

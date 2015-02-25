@@ -13,6 +13,14 @@ android {
 
         instrumentTest.setRoot('tests')
     }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            // use minifyEnabled instead of runProguard if your gradle plugin version is 0.14+
+            proguardFile 'proguard.cfg'
+        }
+    }
 }
 
 // needed to add JNI shared libraries to APK when compiling on CLI

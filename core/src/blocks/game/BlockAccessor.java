@@ -39,7 +39,6 @@ public class BlockAccessor implements TweenAccessor<Block>
             break;
 
             case Opacity:
-                Log.Write("Setting alpha for " + target.toString() + " -> " + newValues[0]);
                 target.setAlpha(newValues[0]);
             break;
         }

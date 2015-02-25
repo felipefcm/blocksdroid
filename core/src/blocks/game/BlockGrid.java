@@ -57,8 +57,8 @@ public class BlockGrid extends InputAdapter
 
 	private TweenManager tweenManager;
 
-	private final float minTouchLength = Block.BlockViewSize * 0.4f;
-	private final float maxTouchLength = Block.BlockViewSize * 3.0f;
+	private final float minTouchLength = Block.BlockViewSize * 0.5f;
+	private final float maxTouchLength = Block.BlockViewSize * 5.0f;
 
 	private final float swapTweenDuration = 0.1f;
     private final float destroyTweenDuration = 0.2f;
@@ -651,7 +651,7 @@ public class BlockGrid extends InputAdapter
 			return;
 		}
 		
-		if(Math.abs(deltaX) >= minTouchLength && Math.abs(deltaY) >= minTouchLength)
+		if(Math.abs(deltaX) >= minTouchLength * 1.3f && Math.abs(deltaY) >= minTouchLength * 1.3f)
 		{
 			Log.Write("Ignoring move because it is ambiguous");
 			return;
@@ -728,16 +728,18 @@ public class BlockGrid extends InputAdapter
 		
 		Vector3 srcCornerWorld = FromGridToWorld(srcGridPos);
 		Vector3 dstCornerWorld = FromGridToWorld(dstBlock.GetGridPos());
-		
-		swapLine.CreateLine
-                (
-                        new Vector2(srcCornerWorld.x + Block.BlockViewSize * 0.5f, srcCornerWorld.y + Block.BlockViewSize * 0.5f),
-                        new Vector2(dstCornerWorld.x + Block.BlockViewSize * 0.5f, dstCornerWorld.y + Block.BlockViewSize * 0.5f),
-                        wrongMove
-                );
-		
+
 		if(wrongMove)
-			return;
+        {
+            swapLine.CreateLine
+            (
+                new Vector2(srcCornerWorld.x + Block.BlockViewSize * 0.5f, srcCornerWorld.y + Block.BlockViewSize * 0.5f),
+                new Vector2(dstCornerWorld.x + Block.BlockViewSize * 0.5f, dstCornerWorld.y + Block.BlockViewSize * 0.5f),
+                true
+            );
+
+            return;
+        }
 		
 		//we can finally switch the blocks
 		SwapBlocksInGrid(srcBlock, dstBlock);
