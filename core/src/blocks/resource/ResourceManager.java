@@ -133,7 +133,7 @@ public class ResourceManager
 
 		blocksdroidText = new BitmapFontCache(bloxFont);
 		blocksdroidText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
-		blocksdroidText.addText("BLOCKSDROID", (Blocksdroid.V_WIDTH - bounds.width) / 2.0f, Blocksdroid.V_HEIGHT * 0.9f);
+		blocksdroidText.addText("BLOCKSDROID", (Blocksdroid.V_WIDTH - bounds.width) / 2.0f, Blocksdroid.V_HEIGHT * 0.88f);
 		
 		scoreText = new BitmapFontCache(ackFont);
 		scoreText.setColor(0.93f, 0.95f, 0.95f, 1.0f);

@@ -59,8 +59,6 @@ public class Blocksdroid extends Game
 			);
 		}
 		m_ShapeRenderer.end();
-
-        ResourceManager.instance.tweenManager.update(Gdx.graphics.getDeltaTime());
 		
 		super.render();
 	}

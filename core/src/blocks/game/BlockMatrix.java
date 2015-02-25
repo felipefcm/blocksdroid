@@ -57,12 +57,13 @@ public class BlockMatrix
 				m_Blocks[i][j] = null;
 	}
 	
-	public void DisposeBlock(Point<Integer> pos)
+	public void DisposeBlock(Point<Integer> pos, boolean poolBlock)
 	{
 		Block block = m_Blocks[pos.y][pos.x];
 		
 		m_Blocks[pos.y][pos.x] = null;
-		
-		BlockFactory.PoolBlock(block);
+
+		if(poolBlock)
+		    BlockFactory.PoolBlock(block);
 	}
 }

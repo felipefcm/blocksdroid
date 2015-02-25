@@ -30,7 +30,9 @@ public class BlockFactory
 		{
 			newBlock = new Block(type);			
 			newBlock.setSize(Block.BlockViewSize, Block.BlockViewSize);
-		}		
+		}
+
+		newBlock.setAlpha(1.0f);
 		
 		return newBlock;
 	}

@@ -1,7 +1,9 @@
 
 package blocks.game;
 
+import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
 import aurelienribon.tweenengine.equations.Bounce;
 import aurelienribon.tweenengine.equations.Linear;
@@ -21,6 +23,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+
+import java.util.LinkedList;
 
 public class BlockGrid extends InputAdapter
 {
@@ -55,6 +59,13 @@ public class BlockGrid extends InputAdapter
 
 	private final float minTouchLength = Block.BlockViewSize * 0.4f;
 	private final float maxTouchLength = Block.BlockViewSize * 3.0f;
+
+	private final float swapTweenDuration = 0.1f;
+    private final float destroyTweenDuration = 0.2f;
+    private final float moveDownTweenDuration = 0.08f;
+
+    //blocks that have been removed from matrix but still are needed to animate
+    private LinkedList<Block> animatingBlocks;
 	
 	public enum MoveDirection
 	{
@@ -77,6 +88,8 @@ public class BlockGrid extends InputAdapter
 		touchMoveStartedPoint = new Point<Integer>();
 		touchMoveFinishedPoint = new Point<Integer>();
 
+		animatingBlocks = new LinkedList<Block>();
+
         Tween.registerAccessor(Block.class, new BlockAccessor());
 	}
 	
@@ -89,6 +102,7 @@ public class BlockGrid extends InputAdapter
 		matchEnded = false;
 		
 		matrix.ClearAll();
+		animatingBlocks.clear();
 		
 		emptyPositions = numRows * numCols;
 		
@@ -135,6 +149,8 @@ public class BlockGrid extends InputAdapter
 	
 	public void Render()
 	{
+        ResourceManager.instance.tweenManager.update(Gdx.graphics.getDeltaTime());
+
 		updateTime += Gdx.graphics.getDeltaTime();
 		
 		if(updateTime >= match.gameSpeed)
@@ -159,6 +175,17 @@ public class BlockGrid extends InputAdapter
 		spriteBatch.setProjectionMatrix(ResourceManager.instance.camera.combined);
 		
 		matrix.Render(spriteBatch);
+
+		if(animatingBlocks.size() > 0)
+        {
+            spriteBatch.begin();
+            {
+		        for(Block b : animatingBlocks)
+		            b.draw(spriteBatch);
+            }
+		    spriteBatch.end();
+        }
+
 		
 		if(swapLine.m_IsVisible)
 			swapLine.Render(shapeRenderer);
@@ -167,6 +194,7 @@ public class BlockGrid extends InputAdapter
 	public void Dispose()
 	{
 		matrix.ClearAll();
+		animatingBlocks.clear();
 	}
 	
     //Grid management --------------------------------------------------------
@@ -193,12 +221,30 @@ public class BlockGrid extends InputAdapter
 
 	private void RemoveBlockFromGrid(Point<Integer> gridPos)
 	{
-		if(matrix.GetAt(gridPos) == null)
+	    final Block block = matrix.GetAt(gridPos);
+
+		if(block == null)
 			return;
-		
-		matrix.DisposeBlock(gridPos);
-		
-		++emptyPositions;
+
+        animatingBlocks.add(block);
+
+        matrix.DisposeBlock(gridPos, false);
+        ++emptyPositions;
+
+        Tween.to(block, BlockAccessor.Opacity, destroyTweenDuration)
+             .target(0.0f)
+             .ease(Linear.INOUT)
+             .setCallbackTriggers(TweenCallback.COMPLETE)
+             .setCallback(new TweenCallback()
+                          {
+                              @Override
+                              public void onEvent(int type, BaseTween<?> source)
+                              {
+                                  animatingBlocks.remove(block);
+                                  BlockFactory.PoolBlock(block);
+                              }
+                          })
+             .start(tweenManager);
 	}
 	
 	private boolean MoveBlockInGrid(Block block, Point<Integer> dstGridPos)
@@ -214,10 +260,15 @@ public class BlockGrid extends InputAdapter
 		matrix.ClearPosition(srcGridPos);
 		
 		block.SetGridPos(dstGridPos);
-		block.setPosition(dstGridPos.x * Block.BlockViewSize, dstGridPos.y * Block.BlockViewSize);
-		
 		matrix.SetBlockAt(block, dstGridPos);
-		
+
+		//block.setPosition(dstGridPos.x * Block.BlockViewSize, dstGridPos.y * Block.BlockViewSize);
+
+		Tween.to(block, BlockAccessor.PositionXY, block == fallingPiece ? 0.03f : moveDownTweenDuration)
+		     .target(dstGridPos.x * Block.BlockViewSize, dstGridPos.y * Block.BlockViewSize)
+		     .ease(Linear.INOUT)
+		     .start(tweenManager);
+
 		return true;
 	}
 	
@@ -235,12 +286,12 @@ public class BlockGrid extends InputAdapter
 		//blockA.setPosition(bGridPos.x * Block.BlockViewSize, bGridPos.y * Block.BlockViewSize);
 		//blockB.setPosition(aGridPos.x * Block.BlockViewSize, aGridPos.y * Block.BlockViewSize);
 
-        Tween.to(blockA, BlockAccessor.PositionXY, 0.1f)
+        Tween.to(blockA, BlockAccessor.PositionXY, swapTweenDuration)
              .target(bGridPos.x * Block.BlockViewSize, bGridPos.y * Block.BlockViewSize)
              .ease(Linear.INOUT)
              .start(tweenManager);
 
-        Tween.to(blockB, BlockAccessor.PositionXY, 0.1f)
+        Tween.to(blockB, BlockAccessor.PositionXY, swapTweenDuration)
              .target(aGridPos.x * Block.BlockViewSize, aGridPos.y * Block.BlockViewSize)
              .ease(Linear.INOUT)
              .start(tweenManager);

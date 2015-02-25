@@ -62,7 +62,7 @@ public class SwapLine
 		
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glLineWidth(Blocksdroid.V_HEIGHT * 0.00625f);
-		
+
 		shapeRenderer.begin(ShapeType.Line);
 		{
 			if(!m_WrongMove)
