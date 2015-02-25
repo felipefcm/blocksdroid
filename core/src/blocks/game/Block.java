@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 public class Block extends Sprite
 {
 	public static final int m_sBlockRealSize = 64;
-	public static float m_sBlockViewSize;
+	public static float BlockViewSize;
 	
 	public enum BlockType
 	{
@@ -19,7 +19,7 @@ public class Block extends Sprite
 		Orange
 	}
 	
-	public boolean m_IsPlaced;
+	public boolean isPlaced;
 	
 	private boolean m_IsFixed;
 	
@@ -32,7 +32,7 @@ public class Block extends Sprite
 	{
 		m_GridPosX = m_GridPosY = 0;
 		
-		m_IsPlaced = false;
+		isPlaced = false;
 		m_IsFixed = false;
 		
 		m_Type = type;
@@ -46,36 +46,36 @@ public class Block extends Sprite
 			case Red:
 			{
 				if(!m_IsFixed)
-					this.setRegion(ResourceManager.m_sInstance.redBlockRegion);
+					this.setRegion(ResourceManager.instance.redBlockRegion);
 				else
-					this.setRegion(ResourceManager.m_sInstance.redBlockFixedRegion);
+					this.setRegion(ResourceManager.instance.redBlockFixedRegion);
 			}
 			break;
 			
 			case Green:
 			{
 				if(!m_IsFixed)
-					this.setRegion(ResourceManager.m_sInstance.greenBlockRegion);
+					this.setRegion(ResourceManager.instance.greenBlockRegion);
 				else
-					this.setRegion(ResourceManager.m_sInstance.greenBlockFixedRegion);
+					this.setRegion(ResourceManager.instance.greenBlockFixedRegion);
 			}
 			break;
 			
 			case Blue:
 			{
 				if(!m_IsFixed)
-					this.setRegion(ResourceManager.m_sInstance.blueBlockRegion);
+					this.setRegion(ResourceManager.instance.blueBlockRegion);
 				else
-					this.setRegion(ResourceManager.m_sInstance.blueBlockFixedRegion);
+					this.setRegion(ResourceManager.instance.blueBlockFixedRegion);
 			}
 			break;
 			
 			case Orange:
 			{
 				if(!m_IsFixed)
-					this.setRegion(ResourceManager.m_sInstance.orangeBlockRegion);
+					this.setRegion(ResourceManager.instance.orangeBlockRegion);
 				else
-					this.setRegion(ResourceManager.m_sInstance.orangeBlockFixedRegion);
+					this.setRegion(ResourceManager.instance.orangeBlockFixedRegion);
 			}
 			break;
 		}

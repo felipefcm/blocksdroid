@@ -2,7 +2,6 @@
 package blocks.screen;
 
 import blocks.game.Blocksdroid;
-import blocks.resource.Point;
 import blocks.resource.ResourceManager;
 import blocks.screen.ScreenManager.ScreenType;
 
@@ -20,18 +19,18 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MainMenuScreen extends GameScreen
 {
-	public Stage m_Stage;
-	public Table m_Table;
+	public Stage stage;
+	public Table table;
 	
-	public Label m_TitleLabel;
+	public Label titleLabel;
 	
-	public TextButton m_PlayButton;
-	public TextButton m_TutorialButton;
-	public TextButton m_LeaderboardsButton;
-	public TextButton m_QuitButton;
+	public TextButton playButton;
+	public TextButton tutorialButton;
+	public TextButton leaderboardsButton;
+	public TextButton quitButton;
 	
-	private SpriteBatch m_Batch;
-	private Viewport m_Viewport;
+	private SpriteBatch batch;
+	private Viewport viewport;
 	
 	public MainMenuScreen()
 	{
@@ -40,105 +39,104 @@ public class MainMenuScreen extends GameScreen
 	@Override
 	public void show()
 	{	
-		m_Batch = ResourceManager.m_sInstance.spriteBatch;
-		m_Viewport = ResourceManager.m_sInstance.viewport;
+		batch = ResourceManager.instance.spriteBatch;
+		viewport = ResourceManager.instance.viewport;
 
-		if(ResourceManager.m_sInstance.adManager != null)
-		    ResourceManager.m_sInstance.adManager.EnableAds();
+		if(ResourceManager.instance.adManager != null)
+		    ResourceManager.instance.adManager.EnableAds();
 				
-		m_Table = new Table();
-		m_Table.setFillParent(true);
+		table = new Table();
+		table.setFillParent(true);
 		
-		m_Stage = new Stage(m_Viewport, m_Batch);
-		m_Stage.addActor(m_Table);
+		stage = new Stage(viewport, batch);
+		stage.addActor(table);
 		
-		Gdx.input.setInputProcessor(m_Stage);
+		Gdx.input.setInputProcessor(stage);
 		
-		LabelStyle labelStyle = ResourceManager.m_sInstance.titleLabelStyle;
-		TextButtonStyle textButtonStyle = ResourceManager.m_sInstance.textButtonStyle;
+		LabelStyle labelStyle = ResourceManager.instance.titleLabelStyle;
+		TextButtonStyle textButtonStyle = ResourceManager.instance.textButtonStyle;
 		
-		m_TitleLabel = new Label("BLOCKSDROID", labelStyle);
-		m_PlayButton = new TextButton("PLAY", textButtonStyle);
-		m_TutorialButton = new TextButton("TUTORIAL", textButtonStyle);
-		m_LeaderboardsButton = new TextButton("LEADERBOARDS", textButtonStyle);
-		m_QuitButton = new TextButton("QUIT", textButtonStyle);
+		titleLabel = new Label("BLOCKSDROID", labelStyle);
+		playButton = new TextButton("PLAY", textButtonStyle);
+		tutorialButton = new TextButton("TUTORIAL", textButtonStyle);
+		leaderboardsButton = new TextButton("LEADERBOARDS", textButtonStyle);
+		quitButton = new TextButton("QUIT", textButtonStyle);
 		
-		m_PlayButton.addListener
-		(
-			new ClickListener()
-			{
-				@Override
-				public void clicked(InputEvent event, float x, float y)
-				{
-					ScreenManager.m_sInstance.SetScreen(new PlayScreen());
-				}
-			}
-		);
+		playButton.addListener
+        (
+            new ClickListener()
+            {
+                @Override
+                public void clicked(InputEvent event, float x, float y)
+                {
+                    ScreenManager.instance.SetScreen(new PlayScreen());
+                }
+            }
+        );
 		
-		m_TutorialButton.addListener
-		(
-			new ClickListener()
-			{
-				@Override
-				public void clicked(InputEvent event, float x, float y)
-				{
-					ScreenManager.m_sInstance.SetScreen(new TutorialScreen());
-				}
-			}
-		);
+		tutorialButton.addListener
+        (
+            new ClickListener()
+            {
+                @Override
+                public void clicked(InputEvent event, float x, float y)
+                {
+                    ScreenManager.instance.SetScreen(new TutorialScreen());
+                }
+            }
+        );
 		
-		m_LeaderboardsButton.addListener
-		(
-			new ClickListener()
-			{
-				@Override
-				public void clicked(InputEvent event, float x, float y)
-				{
-
-				}
-			}
-		);
+		leaderboardsButton.addListener
+        (
+            new ClickListener()
+            {
+                @Override
+                public void clicked(InputEvent event, float x, float y)
+                {
+                }
+            }
+        );
 		
-		m_QuitButton.addListener
-		(
-			new ClickListener()
-			{
-				@Override
-				public void clicked(InputEvent event, float x, float y)
-				{
-					dispose();
-					ResourceManager.m_sInstance.game.OnExit();
-				}
-			}
-		);
+		quitButton.addListener
+        (
+            new ClickListener()
+            {
+                @Override
+                public void clicked(InputEvent event, float x, float y)
+                {
+                    dispose();
+                    ResourceManager.instance.game.OnExit();
+                }
+            }
+        );
 		
 		float buttonsWidth = Blocksdroid.V_WIDTH * 0.8f;
 		float buttonsHeight = Blocksdroid.V_HEIGHT * 0.12f;
 		float buttonsSpacing = Blocksdroid.V_HEIGHT * 0.0078f;
 		
-		m_Table.add(m_TitleLabel).padBottom(Blocksdroid.V_HEIGHT * 0.02f);
-		m_Table.row();
+		table.add(titleLabel).padBottom(Blocksdroid.V_HEIGHT * 0.02f);
+		table.row();
 		
-		m_Table.add(m_PlayButton).width(buttonsWidth).height(buttonsHeight).padTop(Blocksdroid.V_HEIGHT * 0.08f).spaceBottom(buttonsSpacing);
-		m_Table.row();
-		m_Table.add(m_TutorialButton).width(buttonsWidth).height(buttonsHeight).spaceBottom(buttonsSpacing);
-		m_Table.row();
-		m_Table.add(m_LeaderboardsButton).width(buttonsWidth).height(buttonsHeight).spaceBottom(buttonsSpacing);
-		m_Table.row();
-		m_Table.add(m_QuitButton).width(buttonsWidth).height(buttonsHeight);
+		table.add(playButton).width(buttonsWidth).height(buttonsHeight).padTop(Blocksdroid.V_HEIGHT * 0.08f).spaceBottom(buttonsSpacing);
+		table.row();
+		table.add(tutorialButton).width(buttonsWidth).height(buttonsHeight).spaceBottom(buttonsSpacing);
+		table.row();
+		table.add(leaderboardsButton).width(buttonsWidth).height(buttonsHeight).spaceBottom(buttonsSpacing);
+		table.row();
+		table.add(quitButton).width(buttonsWidth).height(buttonsHeight);
 	}
 	
 	@Override
 	public void render(float delta)
 	{
-		m_Stage.act(delta);
+		stage.act(delta);
 		
-		//m_Table.debug();
+		//table.debug();
 		
-		m_Stage.draw();
+		stage.draw();
 		
 		//for debugging
-		//Table.drawDebug(m_Stage);
+		//Table.drawDebug(stage);
 	}
 
 	@Override
@@ -165,8 +163,8 @@ public class MainMenuScreen extends GameScreen
 	@Override
 	public void dispose()
 	{	
-		m_Stage.dispose();
-		m_Table = null;
+		stage.dispose();
+		table = null;
 	}
 
 	@Override

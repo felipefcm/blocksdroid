@@ -2,7 +2,6 @@
 package blocks.screen;
 
 import blocks.game.Blocksdroid;
-import blocks.resource.Point;
 import blocks.resource.ResourceManager;
 import blocks.screen.ScreenManager.ScreenType;
 
@@ -15,23 +14,23 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class TutorialScreen extends GameScreen
 {
-	private Texture m_TutorialTexture;
-	private Sprite m_TutorialSprite;
+	private Texture tutorialTexture;
+	private Sprite tutorialSprite;
 	
-	private SpriteBatch m_Batch;
+	private SpriteBatch batch;
 	
 	@Override
 	public void show()
 	{
-		m_Batch = ResourceManager.m_sInstance.spriteBatch;
+		batch = ResourceManager.instance.spriteBatch;
 		
-		m_TutorialTexture = new Texture(Gdx.files.internal("gfx/tutorial.png"));
-		m_TutorialSprite = new Sprite(m_TutorialTexture);
+		tutorialTexture = new Texture(Gdx.files.internal("gfx/tutorial.png"));
+		tutorialSprite = new Sprite(tutorialTexture);
 		
-		m_TutorialSprite.setBounds(0, 0, Blocksdroid.V_WIDTH, Blocksdroid.V_HEIGHT);
+		tutorialSprite.setBounds(0, 0, Blocksdroid.V_WIDTH, Blocksdroid.V_HEIGHT);
 
-		if(ResourceManager.m_sInstance.adManager != null)
-		    ResourceManager.m_sInstance.adManager.DisableAds();
+		if(ResourceManager.instance.adManager != null)
+		    ResourceManager.instance.adManager.DisableAds();
 		
 		Gdx.input.setInputProcessor
 		(
@@ -40,7 +39,7 @@ public class TutorialScreen extends GameScreen
 				@Override
 				public boolean touchUp(int screenX, int screenY, int pointer, int button)
 				{
-					ScreenManager.m_sInstance.SetScreen(new MainMenuScreen());
+					ScreenManager.instance.SetScreen(new MainMenuScreen());
 					return true;
 				}
 				
@@ -49,7 +48,7 @@ public class TutorialScreen extends GameScreen
 				{
 					if(keycode == Keys.BACK)
 					{
-						ScreenManager.m_sInstance.SetScreen(new MainMenuScreen());
+						ScreenManager.instance.SetScreen(new MainMenuScreen());
 						return true;
 					}
 						
@@ -62,12 +61,12 @@ public class TutorialScreen extends GameScreen
 	@Override
 	public void render(float delta)
 	{
-		m_Batch.setTransformMatrix(ResourceManager.m_sInstance.identityMatrix);
-		m_Batch.begin();
+		batch.setTransformMatrix(ResourceManager.instance.identityMatrix);
+		batch.begin();
 		{
-			m_TutorialSprite.draw(m_Batch);
+			tutorialSprite.draw(batch);
 		}
-		m_Batch.end();
+		batch.end();
 	}
 
 	@Override
@@ -80,8 +79,8 @@ public class TutorialScreen extends GameScreen
 	{
 		dispose();
 
-        if(ResourceManager.m_sInstance.adManager != null)
-		    ResourceManager.m_sInstance.adManager.EnableAds();
+        if(ResourceManager.instance.adManager != null)
+		    ResourceManager.instance.adManager.EnableAds();
 	}
 
 	@Override
@@ -97,7 +96,7 @@ public class TutorialScreen extends GameScreen
 	@Override
 	public void dispose()
 	{
-		m_TutorialTexture.dispose();
+		tutorialTexture.dispose();
 	}
 
 	@Override

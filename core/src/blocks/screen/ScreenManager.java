@@ -6,7 +6,7 @@ import blocks.resource.ResourceManager;
 
 public class ScreenManager 
 {
-	public static ScreenManager m_sInstance = new ScreenManager();
+	public static ScreenManager instance = new ScreenManager();
 	
 	public enum ScreenType
 	{
@@ -15,17 +15,17 @@ public class ScreenManager
 		Tutorial
 	}
 	
-	private Blocksdroid m_Game;
-	private GameScreen m_CurrentScreen;
+	private Blocksdroid game;
+	private GameScreen currentScreen;
 	
 	public ScreenManager()
 	{
-		m_CurrentScreen = null;		
+		currentScreen = null;
 	}
 	
 	public boolean Init()
 	{
-		m_Game = ResourceManager.m_sInstance.game;
+		game = ResourceManager.instance.game;
 		
 		//initial scene
 		SetScreen(new MainMenuScreen());
@@ -35,10 +35,10 @@ public class ScreenManager
 	
 	public void SetScreen(GameScreen screen)
 	{
-		m_CurrentScreen = screen;
+		currentScreen = screen;
 		
 		//setScreen already calls hide() in the old screen
-		m_Game.setScreen(screen);
+		game.setScreen(screen);
 	}
 	
 	public void ActivityPaused()
@@ -47,15 +47,15 @@ public class ScreenManager
 	
 	public void ActivityResumed()
 	{
-		if(m_CurrentScreen instanceof PlayScreen)
+		if(currentScreen instanceof PlayScreen)
 		{
-			((PlayScreen) m_CurrentScreen).GetMatch().PauseMatch();
+			((PlayScreen) currentScreen).GetMatch().PauseMatch();
 		}
 	}
 	
 	public void Dispose()
 	{
-		if(m_CurrentScreen != null)
-			m_CurrentScreen.hide();
+		if(currentScreen != null)
+			currentScreen.hide();
 	}
 }

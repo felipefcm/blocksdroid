@@ -9,38 +9,38 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class PlayScreen extends GameScreen 
 {	
-	private BlocksMatch m_Match;
-	private SpriteBatch m_SpriteBatch;
+	private BlocksMatch match;
+	private SpriteBatch spriteBatch;
 	
 	public PlayScreen() 
 	{
-		m_Match = new BlocksMatch();
+		match = new BlocksMatch();
 	}
 	
 	@Override
 	public void show() 
 	{	
-		m_SpriteBatch = ResourceManager.m_sInstance.spriteBatch;
+		spriteBatch = ResourceManager.instance.spriteBatch;
 		
-		m_Match.Init();
+		match.Init();
 	}
 
 	@Override
 	public void render(float delta) 
 	{
-		m_SpriteBatch.setTransformMatrix(ResourceManager.m_sInstance.identityMatrix);
-		m_SpriteBatch.begin();
+		spriteBatch.setTransformMatrix(ResourceManager.instance.identityMatrix);
+		spriteBatch.begin();
 		{
-			ResourceManager.m_sInstance.blocksdroidText.draw(m_SpriteBatch);
+			ResourceManager.instance.blocksdroidText.draw(spriteBatch);
 		}
-		m_SpriteBatch.end();
+		spriteBatch.end();
 		
-		m_Match.Render();
+		match.Render();
 	}
 	
 	public BlocksMatch GetMatch()
 	{
-		return m_Match;
+		return match;
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class PlayScreen extends GameScreen
 	@Override
 	public void dispose() 
 	{
-		m_Match.Dispose();
+		match.Dispose();
 	}
 	
 	@Override

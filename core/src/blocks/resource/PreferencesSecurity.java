@@ -9,10 +9,10 @@ public class PreferencesSecurity
 	
 	public boolean IsBestScoreValid(final int score)
 	{	
-		if(!ResourceManager.m_sInstance.preferences.contains("BestScoreKey"))
+		if(!ResourceManager.instance.preferences.contains("BestScoreKey"))
 			return false;
 		
-		String prefHash = ResourceManager.m_sInstance.preferences.getString("BestScoreKey");
+		String prefHash = ResourceManager.instance.preferences.getString("BestScoreKey");
 		String calcHash = CalculateBestScoreHash(score); 
 		
 		if(prefHash.contentEquals(calcHash))

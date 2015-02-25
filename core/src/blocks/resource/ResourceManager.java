@@ -29,7 +29,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class ResourceManager 
 {
-	public static ResourceManager m_sInstance = new ResourceManager();
+	public static ResourceManager instance = new ResourceManager();
 	
 	public static final float m_sGameAspectRatio = 9.0f / 16.0f;
 	
@@ -160,7 +160,7 @@ public class ResourceManager
 		blueBlockFixedRegion = new TextureRegion(blockTexture, 128, 64, 64, 64);
 		orangeBlockFixedRegion = new TextureRegion(blockTexture, 192, 64, 64, 64);
 		
-		Block.m_sBlockViewSize = Blocksdroid.V_WIDTH * 0.15f;
+		Block.BlockViewSize = Blocksdroid.V_WIDTH * 0.15f;
 		
 		mainSkinTexture = new Texture(Gdx.files.internal("gfx/UI/main_skin.png"));
 		mainSkinTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -178,7 +178,7 @@ public class ResourceManager
 			new TextureRegionDrawable(buttonUpRegion),
 			new TextureRegionDrawable(buttonDownRegion),
 			new TextureRegionDrawable(buttonUpRegion),
-                ackFont
+            ackFont
 		);
 		
 		retryButtonStyle = new ButtonStyle
@@ -197,13 +197,13 @@ public class ResourceManager
 				
 		titleLabelStyle = new LabelStyle
 		(
-                bloxFont,
+            bloxFont,
 			new Color(Color.rgba8888(0.93f, 0.95f, 0.95f, 1.0f))
 		);
 		
 		ackLabelStyle = new LabelStyle
 		(
-                ackFont,
+            ackFont,
 			new Color(Color.rgba8888(0.93f, 0.95f, 0.95f, 1.0f))
 		);
 	    //----------------------------------------------------------------
@@ -211,7 +211,7 @@ public class ResourceManager
 		return true;
 	}
 	
-	public void DisposeCommonResources()
+	private void DisposeCommonResources()
 	{
 		mainSkinTexture.dispose();
 		blockTexture.dispose();

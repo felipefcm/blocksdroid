@@ -23,13 +23,13 @@ public class BlockFactory
 			newBlock = m_sBlockPool.pop();
 			
 			newBlock.SetType(type);
-			newBlock.m_IsPlaced = false;
+			newBlock.isPlaced = false;
 			newBlock.SetFixed(false);
 		}
 		else
 		{
 			newBlock = new Block(type);			
-			newBlock.setSize(Block.m_sBlockViewSize, Block.m_sBlockViewSize);
+			newBlock.setSize(Block.BlockViewSize, Block.BlockViewSize);
 		}		
 		
 		return newBlock;
@@ -37,7 +37,7 @@ public class BlockFactory
 	
 	public static Block GetRandomBlock(int maxBlockValue)
 	{
-		int randomValue = ResourceManager.m_sInstance.random.nextInt(maxBlockValue);
+		int randomValue = ResourceManager.instance.random.nextInt(maxBlockValue);
 		
 		return GetBlock(BlockType.values()[randomValue]);
 	}

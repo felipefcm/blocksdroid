@@ -20,83 +20,84 @@ import com.badlogic.gdx.math.Vector3;
 
 public class BlockGrid extends InputAdapter
 {
-//Member variables -------------------------------------------------------
-	private int m_NumRows;
-	private int m_NumCols;
-	private BlockMatrix m_Matrix;
+    //Member variables -------------------------------------------------------
+	private int numRows;
+	private int numCols;
+	private BlockMatrix matrix;
 	
-	private BlocksMatch m_Match;
-	private boolean m_MatchEnded;
+	private BlocksMatch match;
+	private boolean matchEnded;
 	
-	private Matrix4 m_FromGridToWorld;
-	private Matrix4 m_FromWorldToGrid;
+	private Matrix4 fromGridToWorld;
+	private Matrix4 fromWorldToGrid;
 	
-	private SpriteBatch m_SpriteBatch;
-	private ShapeRenderer m_ShapeRenderer;
+	private SpriteBatch spriteBatch;
+	private ShapeRenderer shapeRenderer;
 	
-	private Rectangle m_GridArea;
+	private Rectangle gridArea;
 	
-	private Block m_FallingPiece;
+	private Block fallingPiece;
 	
-	private int m_EmptyPositions;
+	private int emptyPositions;
 	
-	private float m_UpdateTime;
+	private float updateTime;
 	
-	private SwapLine m_SwapLine;
+	private SwapLine swapLine;
 	
-	private Point<Integer> m_TouchMoveStartedPoint;
-	private Point<Integer> m_TouchMoveFinishedPoint;
-	private final float m_MinTouchLength = Block.m_sBlockViewSize * 0.5f;
-	private final float m_MaxTouchLength = Block.m_sBlockViewSize * 2.8f;
+	private Point<Integer> touchMoveStartedPoint;
+	private Point<Integer> touchMoveFinishedPoint;
+
+	private final float minTouchLength = Block.BlockViewSize * 0.4f;
+	private final float maxTouchLength = Block.BlockViewSize * 3.0f;
 	
 	public enum MoveDirection
 	{
 		Up, Down,
 		Right, Left
 	}
-//------------------------------------------------------------------------
+    //------------------------------------------------------------------------
 
 	public BlockGrid(int numRows, int numCols, BlocksMatch match)
 	{
-		m_NumRows = numRows;
-		m_NumCols = numCols;
+		this.numRows = numRows;
+		this.numCols = numCols;
 		
-		m_Match = match;
+		this.match = match;
 		
-		m_Matrix = new BlockMatrix(numRows, numCols);
+		matrix = new BlockMatrix(numRows, numCols);
 		
-		m_SwapLine = new SwapLine();
+		swapLine = new SwapLine();
 		
-		m_TouchMoveStartedPoint = new Point<Integer>();
-		m_TouchMoveFinishedPoint = new Point<Integer>();
+		touchMoveStartedPoint = new Point<Integer>();
+		touchMoveFinishedPoint = new Point<Integer>();
 	}
 	
 	public void Init()
 	{
-		m_SpriteBatch = ResourceManager.m_sInstance.spriteBatch;
-		m_ShapeRenderer = ResourceManager.m_sInstance.shapeRenderer;
+		spriteBatch = ResourceManager.instance.spriteBatch;
+		shapeRenderer = ResourceManager.instance.shapeRenderer;
 		
-		m_MatchEnded = false;
+		matchEnded = false;
 		
-		m_Matrix.ClearAll();
+		matrix.ClearAll();
 		
-		m_EmptyPositions = m_NumRows * m_NumCols;
+		emptyPositions = numRows * numCols;
 		
-		m_UpdateTime = 0;
+		updateTime = 0;
 		
-		m_FromGridToWorld = new Matrix4();
-		
-		m_FromGridToWorld.trn(Blocksdroid.V_WIDTH * 0.125f, Blocksdroid.V_HEIGHT * 0.022f, 0);
-		m_FromWorldToGrid = m_FromGridToWorld.cpy().inv();
-		
-		m_GridArea = new Rectangle
+		gridArea = new Rectangle
 		(
-            Blocksdroid.V_WIDTH * 0.125f,
+            Blocksdroid.V_WIDTH * 0.048f,
             Blocksdroid.V_HEIGHT * 0.022f,
-			m_NumCols * Block.m_sBlockViewSize, 
-			m_NumRows * Block.m_sBlockViewSize
+			numCols * Block.BlockViewSize,
+			numRows * Block.BlockViewSize
 		);
-		
+
+		fromGridToWorld = new Matrix4();
+
+		fromGridToWorld.trn(gridArea.x + 1, gridArea.y, 0);
+		fromWorldToGrid = fromGridToWorld.cpy().inv();
+
 		PrePopulateGrid();
 		
 		Gdx.input.setInputProcessor(this);
@@ -106,15 +107,15 @@ public class BlockGrid extends InputAdapter
 	
 	private void PrePopulateGrid()
 	{
-		for(int i = 0; i < m_NumCols; ++i)
+		for(int i = 0; i < numCols; ++i)
 		{
-			int columnHeight = ResourceManager.m_sInstance.random.nextInt(4);
+			int columnHeight = ResourceManager.instance.random.nextInt(4);
 			
 			for(int k = 0; k < columnHeight; ++k)
 			{
 				Block newBlock = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
 				newBlock.SetGridPos(new Point<Integer>(i, k));
-				newBlock.m_IsPlaced = true;
+				newBlock.isPlaced = true;
 				
 				InsertBlockInGrid(newBlock);
 			}
@@ -125,45 +126,44 @@ public class BlockGrid extends InputAdapter
 	
 	public void Render()
 	{
-		m_UpdateTime += Gdx.graphics.getDeltaTime();
+		updateTime += Gdx.graphics.getDeltaTime();
 		
-		if(m_UpdateTime >= m_Match.m_GameSpeed)
+		if(updateTime >= match.gameSpeed)
 		{
-			m_UpdateTime = 0;
+			updateTime = 0;
 			UpdateGame();
 		}
-		
-		m_ShapeRenderer.begin(ShapeType.Line);
+
+		//grid bounds
+		shapeRenderer.begin(ShapeType.Line);
 		{
-			m_ShapeRenderer.setColor(0.75f, 0.75f, 0.75f, 1.0f);
-			m_ShapeRenderer.rect
-			(
-                Blocksdroid.V_WIDTH * 0.12f,
-                Blocksdroid.V_HEIGHT * 0.018f,
-                Blocksdroid.V_WIDTH * 0.76f,
-                Blocksdroid.V_HEIGHT * 0.685f
-			);
+			shapeRenderer.setColor(0.75f, 0.75f, 0.75f, 1.0f);
+            shapeRenderer.rect
+            (
+                gridArea.x, gridArea.y,
+                gridArea.width + 1, gridArea.height + 1
+            );
 		}
-		m_ShapeRenderer.end();
+		shapeRenderer.end();
 		
-		m_SpriteBatch.setTransformMatrix(m_FromGridToWorld);
-		m_SpriteBatch.setProjectionMatrix(ResourceManager.m_sInstance.camera.combined);
+		spriteBatch.setTransformMatrix(fromGridToWorld);
+		spriteBatch.setProjectionMatrix(ResourceManager.instance.camera.combined);
 		
-		m_Matrix.Render(m_SpriteBatch);
+		matrix.Render(spriteBatch);
 		
-		if(m_SwapLine.m_IsVisible)
-			m_SwapLine.Render(m_ShapeRenderer);
+		if(swapLine.m_IsVisible)
+			swapLine.Render(shapeRenderer);
 	}
 	
 	public void Dispose()
 	{
-		m_Matrix.ClearAll();
+		matrix.ClearAll();
 	}
 	
 //Grid management --------------------------------------------------------
 	private boolean IsGridPositionAvailable(Point<Integer> gridPosition)
 	{
-		return (m_Matrix.GetAt(gridPosition) == null);
+		return (matrix.GetAt(gridPosition) == null);
 	}
 	
 	private boolean InsertBlockInGrid(Block block)
@@ -173,23 +173,23 @@ public class BlockGrid extends InputAdapter
 		if(!IsGridPositionAvailable(blockGridPos))
 			return false;
 				
-		block.setPosition(blockGridPos.x * Block.m_sBlockViewSize, blockGridPos.y * Block.m_sBlockViewSize);
+		block.setPosition(blockGridPos.x * Block.BlockViewSize, blockGridPos.y * Block.BlockViewSize);
 		
-		m_Matrix.SetBlockAt(block, blockGridPos);
+		matrix.SetBlockAt(block, blockGridPos);
 		
-		--m_EmptyPositions;
+		--emptyPositions;
 		
 		return true;
 	}
 
 	private void RemoveBlockFromGrid(Point<Integer> gridPos)
 	{
-		if(m_Matrix.GetAt(gridPos) == null)
+		if(matrix.GetAt(gridPos) == null)
 			return;
 		
-		m_Matrix.DisposeBlock(gridPos);
+		matrix.DisposeBlock(gridPos);
 		
-		++m_EmptyPositions;
+		++emptyPositions;
 	}
 	
 	private boolean MoveBlockInGrid(Block block, Point<Integer> dstGridPos)
@@ -199,15 +199,15 @@ public class BlockGrid extends InputAdapter
 		
 		Point<Integer> srcGridPos = block.GetGridPos();
 		
-		if(m_Matrix.GetAt(srcGridPos) == null)
+		if(matrix.GetAt(srcGridPos) == null)
 			return false;
 		
-		m_Matrix.ClearPosition(srcGridPos);
+		matrix.ClearPosition(srcGridPos);
 		
 		block.SetGridPos(dstGridPos);
-		block.setPosition(dstGridPos.x * Block.m_sBlockViewSize, dstGridPos.y * Block.m_sBlockViewSize);
+		block.setPosition(dstGridPos.x * Block.BlockViewSize, dstGridPos.y * Block.BlockViewSize);
 		
-		m_Matrix.SetBlockAt(block, dstGridPos);
+		matrix.SetBlockAt(block, dstGridPos);
 		
 		return true;
 	}
@@ -217,14 +217,14 @@ public class BlockGrid extends InputAdapter
 		Point<Integer> aGridPos = blockA.GetGridPos();
 		Point<Integer> bGridPos = blockB.GetGridPos();
 		
-		m_Matrix.SetBlockAt(blockB, aGridPos);
-		m_Matrix.SetBlockAt(blockA, bGridPos);
+		matrix.SetBlockAt(blockB, aGridPos);
+		matrix.SetBlockAt(blockA, bGridPos);
 		
 		blockA.SetGridPos(bGridPos);
 		blockB.SetGridPos(aGridPos);
 		
-		blockA.setPosition(bGridPos.x * Block.m_sBlockViewSize, bGridPos.y * Block.m_sBlockViewSize);
-		blockB.setPosition(aGridPos.x * Block.m_sBlockViewSize, aGridPos.y * Block.m_sBlockViewSize);
+		blockA.setPosition(bGridPos.x * Block.BlockViewSize, bGridPos.y * Block.BlockViewSize);
+		blockB.setPosition(aGridPos.x * Block.BlockViewSize, aGridPos.y * Block.BlockViewSize);
 		
 		return true;
 	}
@@ -233,9 +233,9 @@ public class BlockGrid extends InputAdapter
 	{
 		//for testing only
 		
-		for(int i = 0; i < m_NumRows; ++i)
+		for(int i = 0; i < numRows; ++i)
 		{
-			for(int j = 0; j < m_NumCols; ++j)
+			for(int j = 0; j < numCols; ++j)
 			{
 				Block block = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
 				
@@ -249,34 +249,34 @@ public class BlockGrid extends InputAdapter
 	private Vector3 FromGridToWorld(final Point<Integer> gridPosition)
 	{
 		Vector3 blockPosInGridCoords = new Vector3
-				(
-					gridPosition.x * Block.m_sBlockViewSize,
-					gridPosition.y * Block.m_sBlockViewSize,
-					0
-				);
+        (
+            gridPosition.x * Block.BlockViewSize,
+            gridPosition.y * Block.BlockViewSize,
+            0
+        );
 		
-		return blockPosInGridCoords.cpy().mul(m_FromGridToWorld);
+		return blockPosInGridCoords.cpy().mul(fromGridToWorld);
 	}
 	
 	private Point<Integer> FromWorldToGrid(final Vector3 worldPosition)
 	{
-		Vector3 blockPosInGridCoords = worldPosition.cpy().mul(m_FromWorldToGrid);
+		Vector3 blockPosInGridCoords = worldPosition.cpy().mul(fromWorldToGrid);
 		
 		return new Point<Integer>
-				(
-					(int)(blockPosInGridCoords.x / Block.m_sBlockViewSize),
-					(int)(blockPosInGridCoords.y / Block.m_sBlockViewSize)
-				);
+        (
+            (int)(blockPosInGridCoords.x / Block.BlockViewSize),
+            (int)(blockPosInGridCoords.y / Block.BlockViewSize)
+        );
 	}
 	
 	private void MoveDownPlacedBlocks()
 	{
-		for(int i = 1; i < m_NumRows; ++i) //we can skip first row
-			for(int j = 0; j < m_NumCols; ++j)
+		for(int i = 1; i < numRows; ++i) //we can skip first row
+			for(int j = 0; j < numCols; ++j)
 			{
-				Block block = m_Matrix.GetAt(i, j); 
+				Block block = matrix.GetAt(i, j);
 				
-				if(block == null || block == m_FallingPiece)
+				if(block == null || block == fallingPiece)
 					continue;
 				
 				//last occupied position
@@ -284,7 +284,7 @@ public class BlockGrid extends InputAdapter
 				
 				for(k = i - 1; k >= 0; --k)
 				{
-					if(m_Matrix.GetAt(k, j) == null)
+					if(matrix.GetAt(k, j) == null)
 						continue;
 					else
 						break;
@@ -298,31 +298,31 @@ public class BlockGrid extends InputAdapter
 //Falling piece ----------------------------------------------------------
 	private void CreateNewFallingPiece()
 	{
-		if(m_EmptyPositions == 0)
+		if(emptyPositions == 0)
 			return;
 		
 		Point<Integer> newPos = new Point<Integer>();
 		
-		newPos.y = m_NumRows - 1;
+		newPos.y = numRows - 1;
 		
 		do
 		{
 			//pick a random column to spawn falling block
-			newPos.x = ResourceManager.m_sInstance.random.nextInt(m_NumCols);
+			newPos.x = ResourceManager.instance.random.nextInt(numCols);
 		}
 		while(!IsGridPositionAvailable(newPos));
 		
-		m_FallingPiece = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
+		fallingPiece = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
 		
-		m_FallingPiece.SetGridPos(newPos);
+		fallingPiece.SetGridPos(newPos);
 		
-		InsertBlockInGrid(m_FallingPiece);
+		InsertBlockInGrid(fallingPiece);
 	}
 	
 	private void MoveDownFallingPiece(Point<Integer> nextGridPos)
 	{
 		//'nextGridPos' is already checked by 'onTimePassed' function
-		MoveBlockInGrid(m_FallingPiece, nextGridPos);
+		MoveBlockInGrid(fallingPiece, nextGridPos);
 	}	
 //------------------------------------------------------------------------
 	
@@ -348,14 +348,14 @@ public class BlockGrid extends InputAdapter
 			boolean hadColumnDestruction = false;
 			boolean hadRowDestruction = false;
 			
-			for(int col = 0; col < m_NumCols; ++col)
+			for(int col = 0; col < numCols; ++col)
 			{
 				EliminationData colElimination = CheckColumnElimination(col);
 				
 				if(colElimination != null)
 				{
 					DestroyColumnGroup(colElimination.pos, col, colElimination.count);
-					m_Match.IncrementScore(1);
+					match.IncrementScore(1);
 					MoveDownPlacedBlocks(); //TODO check if can move down only that column
 					
 					hadColumnDestruction = true;
@@ -363,14 +363,14 @@ public class BlockGrid extends InputAdapter
 				}
 			}
 			
-			for(int row = 0; row < m_NumRows; ++row)
+			for(int row = 0; row < numRows; ++row)
 			{
 				EliminationData rowElimination = CheckRowElimination(row);
 				
 				if(rowElimination != null)
 				{
 					DestroyRowGroup(rowElimination.pos, row, rowElimination.count);
-					m_Match.IncrementScore(1);
+					match.IncrementScore(1);
 					MoveDownPlacedBlocks(); //TODO check if can move down only three columns
 					
 					hadRowDestruction = true;
@@ -387,11 +387,11 @@ public class BlockGrid extends InputAdapter
 		BlockType currentType = null;
 		int currentTypeCount = 0;
 		
-		for(int i = 0; i < m_NumRows; ++i)
+		for(int i = 0; i < numRows; ++i)
 		{
-			Block block = m_Matrix.GetAt(i, col); 
+			Block block = matrix.GetAt(i, col);
 						
-			if(block != null && block != m_FallingPiece && currentType == block.GetType())
+			if(block != null && block != fallingPiece && currentType == block.GetType())
 			{
 				++currentTypeCount;
 			}
@@ -403,7 +403,7 @@ public class BlockGrid extends InputAdapter
 					return new EliminationData(i - 1, currentTypeCount);
 				}
 				
-				if(block == null || block == m_FallingPiece)
+				if(block == null || block == fallingPiece)
 					return null;
 				
 				currentType = block.GetType();
@@ -414,7 +414,7 @@ public class BlockGrid extends InputAdapter
 		if(currentTypeCount >= 3)
 		{
 			//return the last block (the top most one)
-			return new EliminationData(m_NumRows - 1, currentTypeCount);
+			return new EliminationData(numRows - 1, currentTypeCount);
 		}
 		
 		return null;
@@ -425,11 +425,11 @@ public class BlockGrid extends InputAdapter
 		BlockType currentType = null;
 		int currentTypeCount = 0;
 		
-		for(int i = 0; i < m_NumCols; ++i)
+		for(int i = 0; i < numCols; ++i)
 		{
-			Block block = m_Matrix.GetAt(row, i); 
+			Block block = matrix.GetAt(row, i);
 			
-			if(block != null && block != m_FallingPiece && currentType == block.GetType())
+			if(block != null && block != fallingPiece && currentType == block.GetType())
 			{
 				++currentTypeCount;
 			}
@@ -441,7 +441,7 @@ public class BlockGrid extends InputAdapter
 					return new EliminationData(i - 1, currentTypeCount);
 				}
 				
-				if(block == null || block == m_FallingPiece)
+				if(block == null || block == fallingPiece)
 					currentType = null;
 				else
 					currentType = block.GetType();
@@ -453,7 +453,7 @@ public class BlockGrid extends InputAdapter
 		if(currentTypeCount >= 3)
 		{
 			//return the last block (the right most one)
-			return new EliminationData(m_NumCols - 1, currentTypeCount);
+			return new EliminationData(numCols - 1, currentTypeCount);
 		}
 		
 		return null;
@@ -475,30 +475,30 @@ public class BlockGrid extends InputAdapter
 //Events -----------------------------------------------------------------
 	public void UpdateGame() 
 	{	
-		if(m_MatchEnded)
+		if(matchEnded)
 			return;
 		
 		ProcessScoringConditions();
 		
-		Point<Integer> blockPos = m_FallingPiece.GetGridPos();
+		Point<Integer> blockPos = fallingPiece.GetGridPos();
 		Point<Integer> nextPos = new Point<Integer>(blockPos.x, blockPos.y - 1);
 		
 		//Check if falling piece can fall another position
 		if(nextPos.y < 0 || !IsGridPositionAvailable(nextPos))
 		{
 			//Falling piece cannot fall anymore, place it
-			m_FallingPiece.m_IsPlaced = true;
-			m_FallingPiece = null;
+			fallingPiece.isPlaced = true;
+			fallingPiece = null;
 			
 			ProcessScoringConditions();
 			
 			CreateNewFallingPiece();
 			
-			if(m_FallingPiece == null)
+			if(fallingPiece == null)
 			{
 				//match ended
-				m_MatchEnded = true;
-				m_Match.OnMatchEnded();
+				matchEnded = true;
+				match.OnMatchEnded();
 			}
 		}
 		else
@@ -511,8 +511,8 @@ public class BlockGrid extends InputAdapter
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button)
 	{
-		m_TouchMoveStartedPoint.x = screenX;
-		m_TouchMoveStartedPoint.y = screenY;
+		touchMoveStartedPoint.x = screenX;
+		touchMoveStartedPoint.y = screenY;
 		
 		return true;
 	}
@@ -520,12 +520,12 @@ public class BlockGrid extends InputAdapter
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button)
 	{
-		m_TouchMoveFinishedPoint.x = screenX;
-		m_TouchMoveFinishedPoint.y = screenY;
+		touchMoveFinishedPoint.x = screenX;
+		touchMoveFinishedPoint.y = screenY;
 		
-		if(m_Match.IsPaused())
+		if(match.IsPaused())
 		{
-			m_Match.UnpauseMatch();
+			match.UnpauseMatch();
 			return true;
 		}
 		
@@ -536,35 +536,35 @@ public class BlockGrid extends InputAdapter
 		
 	private void OnTouchMoveFinished()
 	{		
-		Vector3 srcWorldPos = ResourceManager.m_sInstance.viewport.unproject(new Vector3(m_TouchMoveStartedPoint.x, m_TouchMoveStartedPoint.y, 0));
-		Vector3 dstWorldPos = ResourceManager.m_sInstance.viewport.unproject(new Vector3(m_TouchMoveFinishedPoint.x, m_TouchMoveFinishedPoint.y, 0));
+		Vector3 srcWorldPos = ResourceManager.instance.viewport.unproject(new Vector3(touchMoveStartedPoint.x, touchMoveStartedPoint.y, 0));
+		Vector3 dstWorldPos = ResourceManager.instance.viewport.unproject(new Vector3(touchMoveFinishedPoint.x, touchMoveFinishedPoint.y, 0));
 	
 		//FIX
-		if(m_Match.m_PauseButton.getBoundingRectangle().contains(dstWorldPos.x, dstWorldPos.y))
+		if(match.pauseButton.getBoundingRectangle().contains(dstWorldPos.x, dstWorldPos.y))
 		{
-			m_Match.PauseMatch();
+			match.PauseMatch();
 			return;
 		}
 		
-		if(!m_GridArea.contains(new Vector2(srcWorldPos.x, srcWorldPos.y)))
+		if(!gridArea.contains(new Vector2(srcWorldPos.x, srcWorldPos.y)))
 		{
 			Log.Write("Ignoring move because src point not in the grid");
 			return;
 		}
 		
-		if(!m_GridArea.contains(new Vector2(dstWorldPos.x, dstWorldPos.y)))
+		if(!gridArea.contains(new Vector2(dstWorldPos.x, dstWorldPos.y)))
 		{
-			if(dstWorldPos.x < m_GridArea.x)
-				dstWorldPos.x = m_GridArea.x;
+			if(dstWorldPos.x < gridArea.x)
+				dstWorldPos.x = gridArea.x;
 			else
-				if(dstWorldPos.x > m_GridArea.x + m_GridArea.width)
-					dstWorldPos.x = m_GridArea.x + m_GridArea.width;
+				if(dstWorldPos.x > gridArea.x + gridArea.width)
+					dstWorldPos.x = gridArea.x + gridArea.width;
 			
-			if(dstWorldPos.y < m_GridArea.y)
-				dstWorldPos.y = m_GridArea.y;
+			if(dstWorldPos.y < gridArea.y)
+				dstWorldPos.y = gridArea.y;
 			else
-				if(dstWorldPos.y > m_GridArea.y + m_GridArea.height)
-					dstWorldPos.y = m_GridArea.y + m_GridArea.height;
+				if(dstWorldPos.y > gridArea.y + gridArea.height)
+					dstWorldPos.y = gridArea.y + gridArea.height;
 		}
 		
 		Point<Integer> srcGridPos = FromWorldToGrid(srcWorldPos);
@@ -575,19 +575,19 @@ public class BlockGrid extends InputAdapter
 		
 		float length = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 		
-		if(length >= m_MaxTouchLength)
+		if(length >= maxTouchLength)
 		{
 			Log.Write("Ignoring move because it has passed maximum length");
 			return;
 		}
 		
-		if(Math.abs(deltaX) >= m_MinTouchLength && Math.abs(deltaY) >= m_MinTouchLength)
+		if(Math.abs(deltaX) >= minTouchLength && Math.abs(deltaY) >= minTouchLength)
 		{
 			Log.Write("Ignoring move because it is ambiguous");
 			return;
 		}
 		
-		Block srcBlock = m_Matrix.GetAt(srcGridPos);
+		Block srcBlock = matrix.GetAt(srcGridPos);
 		Block dstBlock = null;
 		
 		if(srcBlock == null)
@@ -596,27 +596,27 @@ public class BlockGrid extends InputAdapter
 			return;
 		}
 		
-		if(!srcBlock.m_IsPlaced)
+		if(!srcBlock.isPlaced)
 		{
 			Log.Write("Ignoring move because source block is not placed (falling piece)");
 			return;
 		}
 		
-		if(Math.abs(deltaX) >= m_MinTouchLength)
+		if(Math.abs(deltaX) >= minTouchLength)
 		{
 			if(deltaX > 0)
 			{
 				//Log.Write("Moved right");
 				
-				if(srcGridPos.x < m_NumCols)
-					dstBlock = m_Matrix.GetAt(srcGridPos.y, srcGridPos.x + 1);
+				if(srcGridPos.x < numCols)
+					dstBlock = matrix.GetAt(srcGridPos.y, srcGridPos.x + 1);
 			}
 			else
 			{
 				//Log.Write("Moved left");
 				
 				if(srcGridPos.x > 0)
-					dstBlock = m_Matrix.GetAt(srcGridPos.y, srcGridPos.x - 1);
+					dstBlock = matrix.GetAt(srcGridPos.y, srcGridPos.x - 1);
 			}
 		}
 		else
@@ -625,15 +625,15 @@ public class BlockGrid extends InputAdapter
 			{
 				//Log.Write("Moved up");
 				
-				if(srcGridPos.y < m_NumRows)
-					dstBlock = m_Matrix.GetAt(srcGridPos.y + 1, srcGridPos.x);
+				if(srcGridPos.y < numRows)
+					dstBlock = matrix.GetAt(srcGridPos.y + 1, srcGridPos.x);
 			}
 			else
 			{
 				//Log.Write("Moved down");
 				
 				if(srcGridPos.y > 0)
-					dstBlock = m_Matrix.GetAt(srcGridPos.y - 1, srcGridPos.x);
+					dstBlock = matrix.GetAt(srcGridPos.y - 1, srcGridPos.x);
 			}
 		}
 		
@@ -643,7 +643,7 @@ public class BlockGrid extends InputAdapter
 			return;
 		}
 		
-		if(dstBlock == m_FallingPiece)
+		if(dstBlock == fallingPiece)
 		{
 			Log.Write("Ignoring block switch because destination piece is the falling piece");
 			return;
@@ -659,12 +659,12 @@ public class BlockGrid extends InputAdapter
 		Vector3 srcCornerWorld = FromGridToWorld(srcGridPos);
 		Vector3 dstCornerWorld = FromGridToWorld(dstBlock.GetGridPos());
 		
-		m_SwapLine.CreateLine
-		(
-			new Vector2(srcCornerWorld.x + Block.m_sBlockViewSize * 0.5f, srcCornerWorld.y + Block.m_sBlockViewSize * 0.5f), 
-			new Vector2(dstCornerWorld.x + Block.m_sBlockViewSize * 0.5f, dstCornerWorld.y + Block.m_sBlockViewSize * 0.5f), 
-			wrongMove
-		);
+		swapLine.CreateLine
+                (
+                        new Vector2(srcCornerWorld.x + Block.BlockViewSize * 0.5f, srcCornerWorld.y + Block.BlockViewSize * 0.5f),
+                        new Vector2(dstCornerWorld.x + Block.BlockViewSize * 0.5f, dstCornerWorld.y + Block.BlockViewSize * 0.5f),
+                        wrongMove
+                );
 		
 		if(wrongMove)
 			return;

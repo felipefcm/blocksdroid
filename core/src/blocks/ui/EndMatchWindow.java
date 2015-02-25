@@ -3,7 +3,6 @@ package blocks.ui;
 
 import blocks.game.BlocksMatch;
 import blocks.game.Blocksdroid;
-import blocks.resource.Point;
 import blocks.resource.ResourceManager;
 import blocks.screen.MainMenuScreen;
 import blocks.screen.ScreenManager;
@@ -48,9 +47,9 @@ public class EndMatchWindow
 	
 	public void Init(final BlocksMatch match)
 	{
-		m_Batch = ResourceManager.m_sInstance.spriteBatch;
-		m_Viewport = ResourceManager.m_sInstance.viewport;
-		m_ShapeRenderer = ResourceManager.m_sInstance.shapeRenderer;
+		m_Batch = ResourceManager.instance.spriteBatch;
+		m_Viewport = ResourceManager.instance.viewport;
+		m_ShapeRenderer = ResourceManager.instance.shapeRenderer;
 		
 		m_BgWidth = Blocksdroid.V_WIDTH * 0.7f;
 		m_BgHeight = Blocksdroid.V_HEIGHT * 0.45f;
@@ -61,21 +60,21 @@ public class EndMatchWindow
 		m_Stage = new Stage(m_Viewport, m_Batch);
 		m_Stage.addActor(m_Table);
 		
-		m_GameOverLabel = new Label("GAME OVER", ResourceManager.m_sInstance.ackLabelStyle);
+		m_GameOverLabel = new Label("GAME OVER", ResourceManager.instance.ackLabelStyle);
 		m_GameOverLabel.setAlignment(Align.center);
 		m_GameOverLabel.setColor(0.2f, 0.28f, 0.36f, 1.0f);
 		
-		m_ScoreLabel = new Label("SCORE: " + match.GetScore(), ResourceManager.m_sInstance.ackLabelStyle);
+		m_ScoreLabel = new Label("SCORE: " + match.GetScore(), ResourceManager.instance.ackLabelStyle);
 		m_ScoreLabel.setAlignment(Align.center);
 		
-		m_BestLabel = new Label("BEST: " + match.GetBestScore(), ResourceManager.m_sInstance.ackLabelStyle);
+		m_BestLabel = new Label("BEST: " + match.GetBestScore(), ResourceManager.instance.ackLabelStyle);
 		m_BestLabel.setAlignment(Align.center);
 		
-		m_RetryButton = new Button(ResourceManager.m_sInstance.retryButtonStyle);
+		m_RetryButton = new Button(ResourceManager.instance.retryButtonStyle);
 		
-		m_CancelButton = new Button(ResourceManager.m_sInstance.cancelButtonStyle);
+		m_CancelButton = new Button(ResourceManager.instance.cancelButtonStyle);
 		
-		m_SubmitScoreButton = new TextButton("SUBMIT SCORE", ResourceManager.m_sInstance.textButtonStyle);
+		m_SubmitScoreButton = new TextButton("SUBMIT SCORE", ResourceManager.instance.textButtonStyle);
 		
 		m_Table.add(m_GameOverLabel).width(m_BgWidth * 0.8f).padBottom(8.0f).colspan(2);
 		m_Table.row();
@@ -111,7 +110,7 @@ public class EndMatchWindow
 				@Override
 				public void clicked(InputEvent event, float x, float y)
 				{
-					ScreenManager.m_sInstance.SetScreen(new MainMenuScreen());
+					ScreenManager.instance.SetScreen(new MainMenuScreen());
 				}
 			}
 		);
@@ -143,8 +142,8 @@ public class EndMatchWindow
 		m_ShapeRenderer.end();
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 		
-		//m_Table.debug();
-		//Table.drawDebug(m_Stage);
+		//table.debug();
+		//Table.drawDebug(stage);
 		
 		m_Stage.draw();
 	}

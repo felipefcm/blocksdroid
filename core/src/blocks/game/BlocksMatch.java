@@ -1,7 +1,6 @@
 
 package blocks.game;
 
-import blocks.resource.Point;
 import blocks.resource.PreferencesSecurity;
 import blocks.resource.ResourceManager;
 import blocks.ui.EndMatchWindow;
@@ -15,8 +14,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
 public class BlocksMatch
 {
-	public static final int NumRows = 6;
-	public static final int NumCols = 5;
+	public static final int NumRows = 8;
+	public static final int NumCols = 6;
 	
 	public static final float[] GameSpeeds = 
 	{ 
@@ -25,47 +24,47 @@ public class BlocksMatch
 		0.12f, 0.11f, 0.10f 
 	};
 
-	public float m_GameSpeed;
+	public float gameSpeed;
 
-	private BlockGrid m_BlockGrid;
-	private SpriteBatch m_SpriteBatch;
-	private ShapeRenderer m_ShapeRenderer;
-	private EndMatchWindow m_EndMatchWindow;
+	private BlockGrid blockGrid;
+	private SpriteBatch spriteBatch;
+	private ShapeRenderer shapeRenderer;
+	private EndMatchWindow endMatchWindow;
 	
-	private int m_Score;
-	private int m_BestScore;
+	private int score;
+	private int bestScore;
 	
-	private boolean m_ShowEndMatchWindow;
+	private boolean showEndMatchWindow;
 	
-	public Sprite m_PauseButton;
-	private boolean m_Paused;
+	public Sprite pauseButton;
+	private boolean paused;
 	
 	public BlocksMatch()
 	{
-		m_BlockGrid = new BlockGrid(NumRows, NumCols, this);
-		m_EndMatchWindow = new EndMatchWindow();
+		blockGrid = new BlockGrid(NumRows, NumCols, this);
+		endMatchWindow = new EndMatchWindow();
 	}
 		
 	public void Init()
 	{	
-		m_SpriteBatch = ResourceManager.m_sInstance.spriteBatch;
-		m_ShapeRenderer = ResourceManager.m_sInstance.shapeRenderer;
+		spriteBatch = ResourceManager.instance.spriteBatch;
+		shapeRenderer = ResourceManager.instance.shapeRenderer;
 		
-		if(m_PauseButton == null)
+		if(pauseButton == null)
 		{
-			m_PauseButton = new Sprite(ResourceManager.m_sInstance.pauseButtonRegion);
-			m_PauseButton.setBounds(Blocksdroid.V_WIDTH * 0.8f, Blocksdroid.V_HEIGHT * 0.71f, Blocksdroid.V_WIDTH * 0.08f, Blocksdroid.V_WIDTH * 0.08f);
+			pauseButton = new Sprite(ResourceManager.instance.pauseButtonRegion);
+			pauseButton.setBounds(Blocksdroid.V_WIDTH * 0.8f, Blocksdroid.V_HEIGHT * 0.71f, Blocksdroid.V_WIDTH * 0.08f, Blocksdroid.V_WIDTH * 0.08f);
 		}
 		
-		m_ShowEndMatchWindow = false;
-		m_Paused = false;
+		showEndMatchWindow = false;
+		paused = false;
 		
-		m_GameSpeed = GameSpeeds[0];
+		gameSpeed = GameSpeeds[0];
 		
 		ReadBestScoreInPreferences();
 
-		m_BlockGrid.Init();
-		m_Score = 0;
+		blockGrid.Init();
+		score = 0;
 		
 		//for debugging
 		//OnMatchEnded();
@@ -73,124 +72,124 @@ public class BlocksMatch
 	
 	public void Render()
 	{
-		m_SpriteBatch.begin();
+		spriteBatch.begin();
 		{
-			ResourceManager.m_sInstance.scoreText.draw(m_SpriteBatch);
-			ResourceManager.m_sInstance.ackFont.draw(m_SpriteBatch, "" + m_Score, Blocksdroid.V_WIDTH * 0.45f, Blocksdroid.V_HEIGHT * 0.74f);
+			ResourceManager.instance.scoreText.draw(spriteBatch);
+			ResourceManager.instance.ackFont.draw(spriteBatch, "" + score, Blocksdroid.V_WIDTH * 0.45f, Blocksdroid.V_HEIGHT * 0.74f);
 			
-			m_PauseButton.draw(m_SpriteBatch);
+			pauseButton.draw(spriteBatch);
 		}
-		m_SpriteBatch.end();
+		spriteBatch.end();
 		
-		if(m_Paused)
+		if(paused)
 		{
 			Gdx.gl.glEnable(GL20.GL_BLEND);
-			m_ShapeRenderer.begin(ShapeType.Filled);
+			shapeRenderer.begin(ShapeType.Filled);
 			{
-				m_ShapeRenderer.setColor(0, 0, 0, 0.9f);
-				m_ShapeRenderer.rect(0, 0, Blocksdroid.V_WIDTH, Blocksdroid.V_HEIGHT);
+				shapeRenderer.setColor(0, 0, 0, 0.9f);
+				shapeRenderer.rect(0, 0, Blocksdroid.V_WIDTH, Blocksdroid.V_HEIGHT);
 			}
-			m_ShapeRenderer.end();
+			shapeRenderer.end();
 			Gdx.gl.glDisable(GL20.GL_BLEND);
 			
-			m_SpriteBatch.begin();
+			spriteBatch.begin();
 			{
-				ResourceManager.m_sInstance.pausedText.draw(m_SpriteBatch);
-				ResourceManager.m_sInstance.touchToQuitText.draw(m_SpriteBatch);
+				ResourceManager.instance.pausedText.draw(spriteBatch);
+				ResourceManager.instance.touchToQuitText.draw(spriteBatch);
 			}
-			m_SpriteBatch.end();
+			spriteBatch.end();
 		}
 		else		
-			m_BlockGrid.Render();
+			blockGrid.Render();
 		
-		if(m_ShowEndMatchWindow)
+		if(showEndMatchWindow)
 		{
-			m_EndMatchWindow.Render();
+			endMatchWindow.Render();
 		}
 	}
 	
 	public void PauseMatch()
 	{
-		if(m_ShowEndMatchWindow)
+		if(showEndMatchWindow)
 			return;
 		
-		m_Paused = true;
+		paused = true;
 	}
 	
 	public void UnpauseMatch()
 	{
-		m_Paused = false;
+		paused = false;
 	}
 	
 	public boolean IsPaused()
 	{
-		return m_Paused;
+		return paused;
 	}
 	
 	public void OnMatchEnded()
 	{
-		if(m_Score > m_BestScore)
+		if(score > bestScore)
 		{
-			m_BestScore = m_Score;
+			bestScore = score;
 			WriteBestScoreInPreferences();
 		}
 		
-		m_ShowEndMatchWindow = true;
-		m_EndMatchWindow.Init(this);
+		showEndMatchWindow = true;
+		endMatchWindow.Init(this);
 	}
 	
 	public void RestartMatch()
 	{
-		m_EndMatchWindow.Dispose();
+		endMatchWindow.Dispose();
 		
 		Init();
 	}
 	
 	public void IncrementScore(int inc)
 	{
-		m_Score += inc;
+		score += inc;
 		
-		int speedIndex = (int)((float) m_Score / 20.0f);
+		int speedIndex = (int)((float) score / 20.0f);
 		
 		if(speedIndex < GameSpeeds.length)
-			m_GameSpeed = GameSpeeds[speedIndex];
+			gameSpeed = GameSpeeds[speedIndex];
 		else
-			m_GameSpeed = GameSpeeds[GameSpeeds.length - 1];
+			gameSpeed = GameSpeeds[GameSpeeds.length - 1];
 	}
 	
 	public int GetScore()
 	{
-		return m_Score;
+		return score;
 	}
 	
 	public int GetBestScore()
 	{
-		return m_BestScore;
+		return bestScore;
 	}
 	
 	public void WriteBestScoreInPreferences()
 	{
-		String hash = PreferencesSecurity.m_sInstance.CalculateBestScoreHash(m_BestScore);
+		String hash = PreferencesSecurity.m_sInstance.CalculateBestScoreHash(bestScore);
 		
-		ResourceManager.m_sInstance.preferences.putString("BestScoreKey", hash);
-		ResourceManager.m_sInstance.preferences.putInteger("BestScore", m_BestScore);
+		ResourceManager.instance.preferences.putString("BestScoreKey", hash);
+		ResourceManager.instance.preferences.putInteger("BestScore", bestScore);
 		
-		ResourceManager.m_sInstance.preferences.flush();
+		ResourceManager.instance.preferences.flush();
 	}
 	
 	public void ReadBestScoreInPreferences()
 	{
-		m_BestScore = ResourceManager.m_sInstance.preferences.getInteger("BestScore", 0);
+		bestScore = ResourceManager.instance.preferences.getInteger("BestScore", 0);
 		
-		if(m_BestScore != 0)
+		if(bestScore != 0)
 		{
-			if(!PreferencesSecurity.m_sInstance.IsBestScoreValid(m_BestScore))
-				m_BestScore = 0;
+			if(!PreferencesSecurity.m_sInstance.IsBestScoreValid(bestScore))
+				bestScore = 0;
 		}
 	}
 	
 	public void Dispose()
 	{
-		m_BlockGrid.Dispose();
+		blockGrid.Dispose();
 	}
 }

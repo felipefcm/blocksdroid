@@ -22,7 +22,7 @@ public class Blocksdroid extends Game
 	
 	public Blocksdroid(AdManager adManager)
 	{
-		ResourceManager.m_sInstance.adManager = adManager;
+		ResourceManager.instance.adManager = adManager;
 	}
 	
 	@Override
@@ -30,13 +30,13 @@ public class Blocksdroid extends Game
 	{
 		Gdx.input.setCatchBackKey(true);
 		
-		if(!ResourceManager.m_sInstance.Init(this))
+		if(!ResourceManager.instance.Init(this))
 			Log.Write("Failed to init ResourceManager");
 		
-		if(!ScreenManager.m_sInstance.Init())
+		if(!ScreenManager.instance.Init())
 			Log.Write("Failed to init ScreenManager");
 		
-		m_ShapeRenderer = ResourceManager.m_sInstance.shapeRenderer;
+		m_ShapeRenderer = ResourceManager.instance.shapeRenderer;
 		
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -66,9 +66,9 @@ public class Blocksdroid extends Game
 	@Override
 	public void resize(int width, int height) 
 	{
-		ResourceManager.m_sInstance.viewport.update(width, height, true);
+		ResourceManager.instance.viewport.update(width, height, true);
 		
-		m_ShapeRenderer.setProjectionMatrix(ResourceManager.m_sInstance.camera.combined);
+		m_ShapeRenderer.setProjectionMatrix(ResourceManager.instance.camera.combined);
 		
 		super.resize(width, height);
 	}
@@ -76,7 +76,7 @@ public class Blocksdroid extends Game
 	@Override
 	public void pause()
 	{
-		ScreenManager.m_sInstance.ActivityPaused();
+		ScreenManager.instance.ActivityPaused();
 		super.pause();
 	}
 	
@@ -84,14 +84,14 @@ public class Blocksdroid extends Game
 	public void resume()
 	{
 		super.resume();
-		ScreenManager.m_sInstance.ActivityResumed();
+		ScreenManager.instance.ActivityResumed();
 	}
 
 	@Override
 	public void dispose() 
 	{
-		ScreenManager.m_sInstance.Dispose();
-		ResourceManager.m_sInstance.Dispose();
+		ScreenManager.instance.Dispose();
+		ResourceManager.instance.Dispose();
 	}
 	
 	public void OnExit()

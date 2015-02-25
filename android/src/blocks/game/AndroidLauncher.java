@@ -8,11 +8,9 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import blocks.ad.AdHandler;
 import blocks.ad.AndroidAdManager;
-import blocks.resource.AndroidSwarmResources;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.swarmconnect.Swarm;
 
 public class AndroidLauncher extends AndroidApplication 
 {
