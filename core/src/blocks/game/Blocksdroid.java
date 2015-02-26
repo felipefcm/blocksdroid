@@ -2,6 +2,7 @@
 package blocks.game;
 
 import blocks.ad.AdManager;
+import blocks.resource.GoogleApiInterface;
 import blocks.resource.Log;
 import blocks.resource.ResourceManager;
 import blocks.screen.ScreenManager;
@@ -20,9 +21,10 @@ public class Blocksdroid extends Game
 
 	private ShapeRenderer m_ShapeRenderer;
 	
-	public Blocksdroid(AdManager adManager)
+	public Blocksdroid(AdManager adManager, GoogleApiInterface googleApiInterface)
 	{
 		ResourceManager.instance.adManager = adManager;
+		ResourceManager.instance.googleApiInterface = googleApiInterface;
 	}
 	
 	@Override

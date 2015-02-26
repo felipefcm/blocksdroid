@@ -39,7 +39,7 @@ public class PreferencesSecurity
 		
 		try
 		{
-			digest.update(("bgt23jusdvgby512hyxy3456" + score).getBytes("UTF-8"));
+			digest.update(("bgt23jusdvgby512hyxy3457" + score).getBytes("UTF-8"));
 		}
 		catch(Exception e)
 		{

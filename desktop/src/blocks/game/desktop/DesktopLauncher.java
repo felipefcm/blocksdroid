@@ -16,6 +16,6 @@ public class DesktopLauncher
         config.width = (int)(Blocksdroid.V_WIDTH * Blocksdroid.DESKTOP_SCALE);
         config.height = (int)(Blocksdroid.V_HEIGHT * Blocksdroid.DESKTOP_SCALE);
 
-        new LwjglApplication(new Blocksdroid(null), config);
+        new LwjglApplication(new Blocksdroid(null, null), config);
     }
 }

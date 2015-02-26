@@ -49,6 +49,7 @@ public class ResourceManager
 	public Preferences preferences;
 	
 	public AdManager adManager;
+	public GoogleApiInterface googleApiInterface;
 
 	public TweenManager tweenManager;
     //--------------------------------------------------------------------

@@ -104,6 +104,8 @@ public class MainMenuScreen extends GameScreen
                 @Override
                 public void clicked(InputEvent event, float x, float y)
                 {
+                    if(ResourceManager.instance.googleApiInterface != null)
+                        ResourceManager.instance.googleApiInterface.ShowLeaderboard();
                 }
             }
         );
@@ -139,25 +141,25 @@ public class MainMenuScreen extends GameScreen
         //HACK just to force stage to calculate Actor positions
 		stage.draw();
 
-        float tweenDuration = 0.5f;
+        float tweenDuration = 1.0f;
 
         Tween.from((Actor) playButton, ActorAccessor.PositionX, tweenDuration)
-             .target(-500.0f)
+             .target(-Blocksdroid.V_WIDTH)
              .ease(Linear.INOUT)
              .start(tweenManager);
 
         Tween.from((Actor) tutorialButton, ActorAccessor.PositionX, tweenDuration)
-             .target(500.0f)
+             .target(Blocksdroid.V_WIDTH)
              .ease(Linear.INOUT)
              .start(tweenManager);
 
         Tween.from((Actor) leaderboardsButton, ActorAccessor.PositionX, tweenDuration)
-             .target(-500.0f)
+             .target(-Blocksdroid.V_WIDTH)
              .ease(Linear.INOUT)
              .start(tweenManager);
 
         Tween.from((Actor) quitButton, ActorAccessor.PositionX, tweenDuration)
-             .target(500.0f)
+             .target(Blocksdroid.V_WIDTH)
              .ease(Linear.INOUT)
              .start(tweenManager);
 	}

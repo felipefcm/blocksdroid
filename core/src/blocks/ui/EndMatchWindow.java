@@ -3,6 +3,8 @@ package blocks.ui;
 
 import blocks.game.BlocksMatch;
 import blocks.game.Blocksdroid;
+import blocks.resource.GoogleApiInterface;
+import blocks.resource.PreferencesSecurity;
 import blocks.resource.ResourceManager;
 import blocks.screen.MainMenuScreen;
 import blocks.screen.ScreenManager;
@@ -21,6 +23,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import java.time.Instant;
+import java.util.Date;
 
 public class EndMatchWindow
 {
@@ -122,7 +127,25 @@ public class EndMatchWindow
 				@Override
 				public void clicked(InputEvent event, float x, float y)
 				{
+                    GoogleApiInterface googleApiInterface = ResourceManager.instance.googleApiInterface;
 
+                    if(googleApiInterface == null)
+                        return;
+
+                    match.ReadBestScoreInPreferences();
+
+                    if(!googleApiInterface.IsConnected())
+                    {
+                        googleApiInterface.Connect();
+
+                        int timeout = Date.from(Instant.EPOCH).getSeconds() + 60;
+
+                        while(googleApiInterface.IsConnecting() && Date.from(Instant.EPOCH).getSeconds() < timeout)
+                            ;
+                    }
+
+                    if(googleApiInterface.IsConnected())
+                        googleApiInterface.SendScore(match.GetBestScore());
 				}
 			}
 		);
