@@ -4,7 +4,6 @@ package blocks.ui;
 import blocks.game.BlocksMatch;
 import blocks.game.Blocksdroid;
 import blocks.resource.GoogleApiInterface;
-import blocks.resource.PreferencesSecurity;
 import blocks.resource.ResourceManager;
 import blocks.screen.MainMenuScreen;
 import blocks.screen.ScreenManager;
@@ -23,9 +22,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.Viewport;
-
-import java.time.Instant;
-import java.util.Date;
 
 public class EndMatchWindow
 {
@@ -92,7 +88,7 @@ public class EndMatchWindow
 		m_Table.add(m_CancelButton).width(m_BgWidth * 0.2f).height(m_BgWidth * 0.2f).padTop(m_BgHeight * 0.1f);
 		m_Table.row();
 		
-		m_Table.add(m_SubmitScoreButton).padTop(m_BgWidth * 0.07f).colspan(2);
+		m_Table.add(m_SubmitScoreButton).padTop(m_BgWidth * 0.07f).colspan(2).width(m_BgWidth * 0.95f).height(m_BgHeight * 0.2f);
 		
 		Gdx.input.setInputProcessor(m_Stage);
 		
@@ -138,14 +134,15 @@ public class EndMatchWindow
                     {
                         googleApiInterface.Connect();
 
-                        int timeout = Date.from(Instant.EPOCH).getSeconds() + 60;
-
-                        while(googleApiInterface.IsConnecting() && Date.from(Instant.EPOCH).getSeconds() < timeout)
+                        while(googleApiInterface.IsConnecting())
                             ;
                     }
 
                     if(googleApiInterface.IsConnected())
+                    {
                         googleApiInterface.SendScore(match.GetBestScore());
+                        googleApiInterface.ShowLeaderboard();
+                    }
 				}
 			}
 		);

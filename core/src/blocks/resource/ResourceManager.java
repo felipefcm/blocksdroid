@@ -124,7 +124,7 @@ public class ResourceManager
 	{		
 	    //font -----------------------------------------------------------
 		bloxFont = new BitmapFont(Gdx.files.internal("fonts/blox.fnt"));
-		bloxFont.setScale(Blocksdroid.V_WIDTH * 0.0035f);
+		bloxFont.setScale(Blocksdroid.V_WIDTH * 0.0017f);
 		bloxFont.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		ackFont = new BitmapFont(Gdx.files.internal("fonts/ack.fnt"));

@@ -5,7 +5,6 @@ import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
-import aurelienribon.tweenengine.equations.Bounce;
 import aurelienribon.tweenengine.equations.Linear;
 import blocks.game.Block.BlockType;
 import blocks.resource.BlockFactory;
@@ -70,7 +69,7 @@ public class BlockGrid extends InputAdapter
 	public enum MoveDirection
 	{
 		Up, Down,
-		Right, Left
+        Right, Left
 	}
     //------------------------------------------------------------------------
 
@@ -132,7 +131,7 @@ public class BlockGrid extends InputAdapter
 	{
 		for(int i = 0; i < numCols; ++i)
 		{
-			int columnHeight = ResourceManager.instance.random.nextInt(4);
+			int columnHeight = ResourceManager.instance.random.nextInt(4) + 1;
 			
 			for(int k = 0; k < columnHeight; ++k)
 			{
@@ -160,6 +159,7 @@ public class BlockGrid extends InputAdapter
 		}
 
 		//grid bounds
+        shapeRenderer.setTransformMatrix(ResourceManager.instance.identityMatrix);
 		shapeRenderer.begin(ShapeType.Line);
 		{
 			shapeRenderer.setColor(0.75f, 0.75f, 0.75f, 1.0f);
@@ -170,6 +170,18 @@ public class BlockGrid extends InputAdapter
             );
 		}
 		shapeRenderer.end();
+
+        //fill grid interior
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        {
+            shapeRenderer.setColor(0.17f, 0.25f, 0.33f, 1.0f);
+            shapeRenderer.rect
+            (
+                gridArea.x + 1, gridArea.y + 1,
+                gridArea.width - 1, gridArea.height - 1
+            );
+        }
+        shapeRenderer.end();
 		
 		spriteBatch.setTransformMatrix(fromGridToWorld);
 		spriteBatch.setProjectionMatrix(ResourceManager.instance.camera.combined);
@@ -263,6 +275,12 @@ public class BlockGrid extends InputAdapter
 		matrix.SetBlockAt(block, dstGridPos);
 
 		//block.setPosition(dstGridPos.x * Block.BlockViewSize, dstGridPos.y * Block.BlockViewSize);
+
+        if(tweenManager.containsTarget(block))
+        {
+            Log.Write("Block being animated while trying to move it, killing...");
+            tweenManager.killTarget(block);
+        }
 
 		Tween.to(block, BlockAccessor.PositionXY, block == fallingPiece ? 0.03f : moveDownTweenDuration)
 		     .target(dstGridPos.x * Block.BlockViewSize, dstGridPos.y * Block.BlockViewSize)
@@ -381,8 +399,11 @@ public class BlockGrid extends InputAdapter
 			newPos.x = ResourceManager.instance.random.nextInt(numCols);
 		}
 		while(!IsGridPositionAvailable(newPos));
-		
-		fallingPiece = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
+
+		if(match.GetScore() < 15)
+		    fallingPiece = BlockFactory.GetRandomBlock(BlockFactory.INITIAL_BLOCKS);
+		else
+            fallingPiece = BlockFactory.GetRandomBlock(BlockFactory.ENHANCED_BLOCKS);
 		
 		fallingPiece.SetGridPos(newPos);
 		
@@ -595,7 +616,7 @@ public class BlockGrid extends InputAdapter
 		
 		if(match.IsPaused())
 		{
-			match.UnpauseMatch();
+			match.SetPause(false);
 			return true;
 		}
 		
@@ -612,7 +633,7 @@ public class BlockGrid extends InputAdapter
 		//FIX
 		if(match.pauseButton.getBoundingRectangle().contains(dstWorldPos.x, dstWorldPos.y))
 		{
-			match.PauseMatch();
+			match.SetPause(true);
 			return;
 		}
 		
@@ -741,10 +762,10 @@ public class BlockGrid extends InputAdapter
             return;
         }
 		
+		srcBlock.SetFixed(true);
+
 		//we can finally switch the blocks
 		SwapBlocksInGrid(srcBlock, dstBlock);
-		
-		srcBlock.SetFixed(true);
 	}
     //------------------------------------------------------------------------
 }

@@ -40,7 +40,7 @@ public class Blocksdroid extends Game
 		
 		m_ShapeRenderer = ResourceManager.instance.shapeRenderer;
 		
-		Gdx.gl.glClearColor(0, 0, 0, 0);
+		Gdx.gl.glClearColor(0, 0, 0, 1.0f);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
@@ -69,7 +69,6 @@ public class Blocksdroid extends Game
 	public void resize(int width, int height) 
 	{
 		ResourceManager.instance.viewport.update(width, height, true);
-		
 		m_ShapeRenderer.setProjectionMatrix(ResourceManager.instance.camera.combined);
 		
 		super.resize(width, height);

@@ -141,7 +141,7 @@ public class MainMenuScreen extends GameScreen
         //HACK just to force stage to calculate Actor positions
 		stage.draw();
 
-        float tweenDuration = 1.0f;
+        float tweenDuration = 0.8f;
 
         Tween.from((Actor) playButton, ActorAccessor.PositionX, tweenDuration)
              .target(-Blocksdroid.V_WIDTH)
@@ -149,7 +149,7 @@ public class MainMenuScreen extends GameScreen
              .start(tweenManager);
 
         Tween.from((Actor) tutorialButton, ActorAccessor.PositionX, tweenDuration)
-             .target(Blocksdroid.V_WIDTH)
+             .target(Blocksdroid.V_WIDTH * 1.1f)
              .ease(Linear.INOUT)
              .start(tweenManager);
 
@@ -159,7 +159,7 @@ public class MainMenuScreen extends GameScreen
              .start(tweenManager);
 
         Tween.from((Actor) quitButton, ActorAccessor.PositionX, tweenDuration)
-             .target(Blocksdroid.V_WIDTH)
+             .target(Blocksdroid.V_WIDTH * 1.1f)
              .ease(Linear.INOUT)
              .start(tweenManager);
 	}

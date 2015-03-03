@@ -43,14 +43,14 @@ public class ScreenManager
 	
 	public void ActivityPaused()
 	{
-	}
-	
-	public void ActivityResumed()
-	{
 		if(currentScreen instanceof PlayScreen)
 		{
-			((PlayScreen) currentScreen).GetMatch().PauseMatch();
+			((PlayScreen) currentScreen).GetMatch().SetPause(true);
 		}
+	}
+
+	public void ActivityResumed()
+	{
 	}
 	
 	public void Dispose()
