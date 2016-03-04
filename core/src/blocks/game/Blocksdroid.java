@@ -52,7 +52,7 @@ public class Blocksdroid extends Game
 		//paints the viewport area
 		m_ShapeRenderer.begin(ShapeType.Filled);
 		{
-			m_ShapeRenderer.setColor(0.17f, 0.25f, 0.33f, 1.0f);
+			m_ShapeRenderer.setColor(0.12f, 0.2f, 0.28f, 1.0f);
 			m_ShapeRenderer.rect
 			(
 				0, 0,
@@ -89,7 +89,7 @@ public class Blocksdroid extends Game
 	}
 
 	@Override
-	public void dispose() 
+	public void dispose()
 	{
 		ScreenManager.instance.Dispose();
 		ResourceManager.instance.Dispose();

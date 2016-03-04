@@ -136,6 +136,8 @@ public class BlocksMatch
 
     public void OnMatchEnded()
     {
+        matchState = MatchState.Ended;
+
         ReadBestScoreInPreferences();
 
         if(score > bestScore)

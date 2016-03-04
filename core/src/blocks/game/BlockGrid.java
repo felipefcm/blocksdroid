@@ -56,7 +56,7 @@ public class BlockGrid extends InputAdapter
 
 	private TweenManager tweenManager;
 
-	private final float minTouchLength = Block.BlockViewSize * 0.5f;
+	private final float minTouchLength = Block.BlockViewSize * 0.4f;
 	private final float maxTouchLength = Block.BlockViewSize * 5.0f;
 
 	private final float swapTweenDuration = 0.1f;
@@ -671,6 +671,12 @@ public class BlockGrid extends InputAdapter
 			Log.Write("Ignoring move because it has passed maximum length");
 			return;
 		}
+
+		if(length < minTouchLength)
+        {
+            Log.Write("Ignoring move because shorter than minimum length");
+            return;
+        }
 		
 		if(Math.abs(deltaX) >= minTouchLength * 1.3f && Math.abs(deltaY) >= minTouchLength * 1.3f)
 		{
