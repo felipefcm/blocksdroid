@@ -16,8 +16,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -124,39 +124,39 @@ public class ResourceManager
 	{		
 	    //font -----------------------------------------------------------
 		bloxFont = new BitmapFont(Gdx.files.internal("fonts/blox.fnt"));
-		bloxFont.setScale(Blocksdroid.V_WIDTH * 0.0017f);
+		bloxFont.getData().setScale(Blocksdroid.V_WIDTH * 0.0017f);
 		bloxFont.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		ackFont = new BitmapFont(Gdx.files.internal("fonts/ack.fnt"));
-		ackFont.setScale(Blocksdroid.V_WIDTH * 0.0011f);
-		
-		TextBounds bounds = bloxFont.getBounds("BLOCKSDROID");
+		ackFont.getData().setScale(Blocksdroid.V_WIDTH * 0.0011f);
+
+		GlyphLayout layout = new GlyphLayout(bloxFont, "BLOCKSDROID");
 
 		blocksdroidText = new BitmapFontCache(bloxFont);
 		blocksdroidText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
-		blocksdroidText.addText("BLOCKSDROID", (Blocksdroid.V_WIDTH - bounds.width) / 2.0f, Blocksdroid.V_HEIGHT * 0.88f);
+		blocksdroidText.addText("BLOCKSDROID", (Blocksdroid.V_WIDTH - layout.width) / 2.0f, Blocksdroid.V_HEIGHT * 0.88f);
 		
 		scoreText = new BitmapFontCache(ackFont);
 		scoreText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
 		scoreText.addText("SCORE:", Blocksdroid.V_WIDTH * 0.125f, Blocksdroid.V_HEIGHT * 0.74f);
-		
-		bounds = ackFont.getBounds("PAUSED");
+
+		layout = new GlyphLayout(ackFont, "PAUSED");
 		
 		pausedText = new BitmapFontCache(ackFont);
 		pausedText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
-<<<<<<< Updated upstream
 		pausedText.addText("PAUSED", (Blocksdroid.V_WIDTH - bounds.width) / 2.0f, (Blocksdroid.V_HEIGHT - bounds.height) / 2.0f + Blocksdroid.V_HEIGHT * 0.03f);
 		
 		bounds = ackFont.getBounds("TOUCH TO RESUME");
-=======
 		pausedText.addText("PAUSED", (Blocksdroid.V_WIDTH - layout.width) / 2.0f, (Blocksdroid.V_HEIGHT - layout.height) / 2.0f + Blocksdroid.V_HEIGHT * 0.03f);
 
 		layout = new GlyphLayout(ackFont, "TOUCH TO RESUME");
->>>>>>> Stashed changes
+		pausedText.addText("PAUSED", (Blocksdroid.V_WIDTH - layout.width) / 2.0f, (Blocksdroid.V_HEIGHT - layout.height) / 2.0f + Blocksdroid.V_HEIGHT * 0.03f);
+		
+		layout = new GlyphLayout(ackFont, "TOUCH TO RESUME");
 		
 		touchToQuitText = new BitmapFontCache(ackFont);
 		touchToQuitText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
-		touchToQuitText.addText("TOUCH TO RESUME", (Blocksdroid.V_WIDTH - bounds.width) / 2.0f, (Blocksdroid.V_HEIGHT - bounds.height) / 2.0f - Blocksdroid.V_HEIGHT * 0.03f);
+		touchToQuitText.addText("TOUCH TO RESUME", (Blocksdroid.V_WIDTH - layout.width) / 2.0f, (Blocksdroid.V_HEIGHT - layout.height) / 2.0f - Blocksdroid.V_HEIGHT * 0.03f);
 	    //----------------------------------------------------------------
 		
 	    //textures -------------------------------------------------------
