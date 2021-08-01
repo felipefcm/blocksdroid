@@ -15,7 +15,7 @@ public class AndroidAdManager implements AdManager
 		m_AdView = new AdView(app);
 		
 		m_AdView.setAdSize(AdSize.SMART_BANNER);
-		m_AdView.setAdUnitId("ca-app-pub-4161714016306583/8672369753");
+		m_AdView.setAdUnitId("SET-AD-UNIT");
 		
 		m_TopBanner = new TopBanner(m_AdView);
 	}

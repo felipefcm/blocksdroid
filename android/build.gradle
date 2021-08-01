@@ -21,6 +21,13 @@ android {
             proguardFile 'proguard.cfg'
         }
     }
+
+    dependencies {
+        compile 'com.google.android.gms:play-services-games:8.4.0'
+        compile 'com.google.android.gms:play-services-analytics:8.4.0'
+        compile 'com.google.android.gms:play-services-ads:8.4.0'
+        compile 'com.google.android.gms:play-services-auth:8.4.0'
+    }
 }
 
 // needed to add JNI shared libraries to APK when compiling on CLI

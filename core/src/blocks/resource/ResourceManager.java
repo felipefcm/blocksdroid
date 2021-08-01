@@ -144,9 +144,15 @@ public class ResourceManager
 		
 		pausedText = new BitmapFontCache(ackFont);
 		pausedText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
+<<<<<<< Updated upstream
 		pausedText.addText("PAUSED", (Blocksdroid.V_WIDTH - bounds.width) / 2.0f, (Blocksdroid.V_HEIGHT - bounds.height) / 2.0f + Blocksdroid.V_HEIGHT * 0.03f);
 		
 		bounds = ackFont.getBounds("TOUCH TO RESUME");
+=======
+		pausedText.addText("PAUSED", (Blocksdroid.V_WIDTH - layout.width) / 2.0f, (Blocksdroid.V_HEIGHT - layout.height) / 2.0f + Blocksdroid.V_HEIGHT * 0.03f);
+
+		layout = new GlyphLayout(ackFont, "TOUCH TO RESUME");
+>>>>>>> Stashed changes
 		
 		touchToQuitText = new BitmapFontCache(ackFont);
 		touchToQuitText.setColor(0.93f, 0.95f, 0.95f, 1.0f);
